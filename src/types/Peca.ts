@@ -1,3 +1,12 @@
 export interface Peca {
-	readonly __placeholder?: never
+	id: number
+	codigo: string
+	nome: string
+	categoria: string | null
+	unidadeMedida: string
+	localizacaoFisica: string | null
+	quantidadeAtual: number
+	estoqueMinimo: number | null
+	custoUnitario: number | null
+	abaixoDoMinimo: boolean
 }
