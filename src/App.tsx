@@ -1,4 +1,4 @@
-import { BarChart3, Box, ClipboardList, Cog, FileText, ShoppingCart } from 'lucide-react'
+import { BarChart3, Box, ClipboardList, Cog, FileText, ShoppingCart, Wallet } from 'lucide-react'
 import { NavLink, Route, Routes } from 'react-router-dom'
 import { Maquinas } from '@/pages/Maquinas'
 import { Pecas } from '@/pages/Pecas'
@@ -6,6 +6,7 @@ import { Manutencoes } from '@/pages/Manutencoes'
 import { Estoque } from '@/pages/Estoque'
 import { Compras } from '@/pages/Compras'
 import { Relatorios } from '@/pages/Relatorios'
+import { OrcamentosMensais } from '@/pages/OrcamentosMensais'
 
 const navigation = [
   { label: 'Máquinas', path: '/maquinas', icon: Cog },
@@ -13,6 +14,7 @@ const navigation = [
   { label: 'Manutenções', path: '/manutencoes', icon: ClipboardList },
   { label: 'Estoque', path: '/estoque', icon: BarChart3 },
   { label: 'Compras', path: '/compras', icon: ShoppingCart },
+  { label: 'Orçamentos', path: '/orcamentos', icon: Wallet },
   { label: 'Relatórios', path: '/relatorios', icon: FileText },
 ]
 
@@ -47,6 +49,7 @@ function App() {
           <Route path="/manutencoes" element={<Manutencoes />} />
           <Route path="/estoque" element={<Estoque />} />
           <Route path="/compras" element={<Compras />} />
+          <Route path="/orcamentos" element={<OrcamentosMensais />} />
           <Route path="/relatorios" element={<Relatorios />} />
         </Routes>
       </main>
