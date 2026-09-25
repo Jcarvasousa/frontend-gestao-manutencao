@@ -12,7 +12,7 @@ const navigation = [
   { label: 'Máquinas', path: '/maquinas', icon: Cog },
   { label: 'Peças', path: '/pecas', icon: Box },
   { label: 'Manutenções', path: '/manutencoes', icon: ClipboardList },
-  { label: 'Estoque', path: '/estoque', icon: BarChart3 },
+  { label: 'Movimentações', path: '/estoque', icon: BarChart3 },
   { label: 'Compras', path: '/compras', icon: ShoppingCart },
   { label: 'Orçamentos', path: '/orcamentos', icon: Wallet },
   { label: 'Relatórios', path: '/relatorios', icon: FileText },

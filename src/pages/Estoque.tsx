@@ -75,7 +75,7 @@ export function Estoque() {
   return (
     <section className="mx-auto max-w-6xl px-6 py-10">
       <p className="text-sm font-medium text-slate-500">Módulo</p>
-      <h2 className="mt-2 text-3xl font-semibold tracking-tight">Estoque</h2>
+      <h2 className="mt-2 text-3xl font-semibold tracking-tight">Movimentações</h2>
 
       <div className="mt-6 flex justify-end gap-3">
         <Button variant="outline" onClick={() => setIsSaidaDialogOpen(true)}>
