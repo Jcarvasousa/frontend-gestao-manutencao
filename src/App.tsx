@@ -1,5 +1,6 @@
-import { BarChart3, Box, ClipboardList, Cog, FileText, ShoppingCart, Wallet } from 'lucide-react'
+import { BarChart3, Box, ClipboardList, Cog, FileText, LayoutDashboard, ShoppingCart, Wallet } from 'lucide-react'
 import { NavLink, Route, Routes } from 'react-router-dom'
+import { Dashboard } from '@/pages/Dashboard'
 import { Maquinas } from '@/pages/Maquinas'
 import { Pecas } from '@/pages/Pecas'
 import { Manutencoes } from '@/pages/Manutencoes'
@@ -9,6 +10,7 @@ import { Relatorios } from '@/pages/Relatorios'
 import { OrcamentosMensais } from '@/pages/OrcamentosMensais'
 
 const navigation = [
+  { label: 'Dashboard', path: '/', icon: LayoutDashboard },
   { label: 'Máquinas', path: '/maquinas', icon: Cog },
   { label: 'Peças', path: '/pecas', icon: Box },
   { label: 'Manutenções', path: '/manutencoes', icon: ClipboardList },
@@ -43,7 +45,7 @@ function App() {
           </nav>
         </div>
         <Routes>
-          <Route path="/" element={<Maquinas />} />
+          <Route path="/" element={<Dashboard />} />
           <Route path="/maquinas" element={<Maquinas />} />
           <Route path="/pecas" element={<Pecas />} />
           <Route path="/manutencoes" element={<Manutencoes />} />

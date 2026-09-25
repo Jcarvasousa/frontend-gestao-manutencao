@@ -36,13 +36,15 @@ function formatarMoeda(valor: number): string {
   return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
 
-function ReceberButton({ solicitacao }: { solicitacao: SolicitacaoCompra }) {
+export function ReceberButton({ solicitacao }: { solicitacao: SolicitacaoCompra }) {
   const queryClient = useQueryClient()
 
   const mutation = useMutation({
     mutationFn: () => marcarComoRecebida(solicitacao.id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['solicitacoes'] })
+      queryClient.invalidateQueries({ queryKey: ['solicitacoes-pendentes'] })
+      queryClient.invalidateQueries({ queryKey: ['pecas'] })
     },
     onError: (error) => {
       console.error('Falha ao marcar solicitação como recebida', error)

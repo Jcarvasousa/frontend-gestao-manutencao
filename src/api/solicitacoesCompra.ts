@@ -31,3 +31,8 @@ export async function marcarComoRecebida(id: number): Promise<SolicitacaoCompra>
   const { data } = await apiClient.patch<SolicitacaoCompra>(`/solicitacoes-compra/${id}/receber`)
   return data
 }
+
+export async function buscarPendentes(): Promise<SolicitacaoCompra[]> {
+  const { data } = await apiClient.get<SolicitacaoCompra[]>('/solicitacoes-compra/pendentes')
+  return data
+}
