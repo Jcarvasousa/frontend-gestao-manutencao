@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { baixarGastoRealizadoPdf, buscarGastoRealizado } from '@/api/relatorios'
 import { Button } from '@/components/ui/button'
+import { nomeMes } from '@/lib/meses'
 
 const currencyFormatter = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
@@ -28,7 +29,7 @@ export function RelatorioGastoRealizadoCard({ mes, ano }: RelatorioGastoRealizad
         <>
           <dl>
             <div>
-              <dt className="text-sm text-slate-500">Valor Gasto</dt>
+              <dt className="text-sm text-slate-500">Valor Gasto ({nomeMes(mes)}/{ano})</dt>
               <dd className="text-lg font-semibold">{currencyFormatter.format(query.data.valorGasto)}</dd>
             </div>
           </dl>
