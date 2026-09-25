@@ -3,6 +3,9 @@ import { useQuery } from '@tanstack/react-query'
 import { buscarMaquinas } from '@/api/maquinas'
 import { RelatorioCustoMensalCard } from '@/components/RelatorioCustoMensalCard'
 import { RelatorioCustoMaquinaCard } from '@/components/RelatorioCustoMaquinaCard'
+import { RelatorioOrcamentoMensalCard } from '@/components/RelatorioOrcamentoMensalCard'
+import { RelatorioOrcamentoAnualCard } from '@/components/RelatorioOrcamentoAnualCard'
+import { RelatorioGastoRealizadoCard } from '@/components/RelatorioGastoRealizadoCard'
 import { NOMES_MESES } from '@/lib/meses'
 
 export function Relatorios() {
@@ -100,7 +103,11 @@ export function Relatorios() {
 
       <div className="mt-10">
         <h3 className="text-xl font-semibold tracking-tight">Relatórios de Orçamento</h3>
-        <p className="mt-4 text-sm text-slate-500">Relatórios de orçamento em breve</p>
+        <div className="mt-4 flex flex-col gap-4">
+          <RelatorioOrcamentoMensalCard mes={mes} ano={ano} />
+          <RelatorioOrcamentoAnualCard ano={ano} />
+          <RelatorioGastoRealizadoCard mes={mes} ano={ano} />
+        </div>
       </div>
     </section>
   )
