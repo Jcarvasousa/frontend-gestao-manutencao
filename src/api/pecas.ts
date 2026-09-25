@@ -1,5 +1,5 @@
 import { apiClient } from '@/api/client'
-import type { Peca } from '@/types/Peca'
+import type { Peca, PecaPayload } from '@/types/Peca'
 
 export interface PageResponse<T> {
   content: T[]
@@ -20,5 +20,15 @@ export interface PecasFiltro {
 
 export async function buscarPecas(filtro: PecasFiltro): Promise<PageResponse<Peca>> {
   const { data } = await apiClient.get<PageResponse<Peca>>('/pecas', { params: filtro })
+  return data
+}
+
+export async function criarPeca(payload: PecaPayload): Promise<Peca> {
+  const { data } = await apiClient.post<Peca>('/pecas', payload)
+  return data
+}
+
+export async function atualizarPeca(id: number, payload: PecaPayload): Promise<Peca> {
+  const { data } = await apiClient.put<Peca>(`/pecas/${id}`, payload)
   return data
 }

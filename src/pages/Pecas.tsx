@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangle, Pencil } from 'lucide-react'
 import { buscarPecas } from '@/api/pecas'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { PecaFormDialog } from '@/components/PecaFormDialog'
 import {
   Table,
   TableBody,
@@ -13,6 +14,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
+import type { Peca } from '@/types/Peca'
 
 const PAGE_SIZE = 10
 
@@ -27,6 +29,8 @@ export function Pecas() {
   const [codigo, setCodigo] = useState('')
   const [debouncedCategoria, setDebouncedCategoria] = useState('')
   const [debouncedCodigo, setDebouncedCodigo] = useState('')
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+  const [pecaEmEdicao, setPecaEmEdicao] = useState<Peca | null>(null)
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -56,6 +60,10 @@ export function Pecas() {
     <section className="mx-auto max-w-6xl px-6 py-10">
       <p className="text-sm font-medium text-slate-500">Módulo</p>
       <h2 className="mt-2 text-3xl font-semibold tracking-tight">Peças</h2>
+
+      <div className="mt-6 flex justify-end">
+        <Button onClick={() => setIsCreateDialogOpen(true)}>Nova Peça</Button>
+      </div>
 
       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
         <div className="flex-1">
@@ -99,6 +107,7 @@ export function Pecas() {
                 <TableHead>Quantidade Atual</TableHead>
                 <TableHead>Estoque Mínimo</TableHead>
                 <TableHead>Custo Unitário</TableHead>
+                <TableHead>Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -123,6 +132,17 @@ export function Pecas() {
                     </TableCell>
                     <TableCell>
                       {peca.custoUnitario != null ? currencyFormatter.format(peca.custoUnitario) : '—'}
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        aria-label={`Editar peça ${peca.codigo}`}
+                        title={`Editar peça ${peca.codigo}`}
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setPecaEmEdicao(peca)}
+                      >
+                        <Pencil aria-hidden="true" />
+                      </Button>
                     </TableCell>
                   </TableRow>
               ))}
@@ -155,6 +175,18 @@ export function Pecas() {
           </div>
         </div>
       )}
+
+      <PecaFormDialog
+        open={isCreateDialogOpen}
+        onOpenChange={setIsCreateDialogOpen}
+      />
+      <PecaFormDialog
+        open={Boolean(pecaEmEdicao)}
+        onOpenChange={(open) => {
+          if (!open) setPecaEmEdicao(null)
+        }}
+        peca={pecaEmEdicao}
+      />
     </section>
   )
 }
