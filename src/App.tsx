@@ -1,4 +1,4 @@
-import { BarChart3, Box, ClipboardList, Cog, FileText, LayoutDashboard, ShoppingCart, Wallet } from 'lucide-react'
+import { BarChart3, Box, ClipboardList, Cog, FileText, LayoutDashboard, LogOut, ShoppingCart, Wallet } from 'lucide-react'
 import { NavLink, Route, Routes } from 'react-router-dom'
 import { Dashboard } from '@/pages/Dashboard'
 import { Maquinas } from '@/pages/Maquinas'
@@ -8,6 +8,9 @@ import { Estoque } from '@/pages/Estoque'
 import { Compras } from '@/pages/Compras'
 import { Relatorios } from '@/pages/Relatorios'
 import { OrcamentosMensais } from '@/pages/OrcamentosMensais'
+import { Login } from '@/pages/Login'
+import { ProtectedRoute } from '@/components/ProtectedRoute'
+import { useAuth } from '@/context/AuthContext'
 
 const navigation = [
   { label: 'Dashboard', path: '/', icon: LayoutDashboard },
@@ -20,15 +23,17 @@ const navigation = [
   { label: 'Relatórios', path: '/relatorios', icon: FileText },
 ]
 
-function App() {
+function AppLayout() {
+  const { logout } = useAuth()
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-950">
-      <aside className="fixed inset-y-0 left-0 hidden w-64 border-r border-slate-200 bg-white md:block">
+      <aside className="fixed inset-y-0 left-0 hidden w-64 border-r border-slate-200 bg-white md:flex md:flex-col">
         <div className="border-b border-slate-200 px-6 py-6">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Gestão</p>
           <h1 className="mt-1 text-xl font-semibold tracking-tight">Manutenção</h1>
         </div>
-        <nav className="space-y-1 p-4" aria-label="Navegação principal">
+        <nav className="flex-1 space-y-1 p-4" aria-label="Navegação principal">
           {navigation.map(({ label, path, icon: Icon }) => (
             <NavLink key={path} to={path} className={({ isActive }) => `flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${isActive ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950'}`}>
               <Icon size={18} strokeWidth={1.8} />
@@ -36,6 +41,16 @@ function App() {
             </NavLink>
           ))}
         </nav>
+        <div className="border-t border-slate-200 p-4">
+          <button
+            type="button"
+            onClick={logout}
+            className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-950"
+          >
+            <LogOut size={18} strokeWidth={1.8} />
+            Sair
+          </button>
+        </div>
       </aside>
       <main className="min-h-screen md:ml-64">
         <div className="border-b border-slate-200 bg-white px-6 py-4 md:hidden">
@@ -43,6 +58,14 @@ function App() {
           <nav className="mt-3 flex gap-2 overflow-x-auto" aria-label="Navegação principal">
             {navigation.map(({ label, path }) => <NavLink key={path} to={path} className="whitespace-nowrap rounded-md px-3 py-2 text-sm text-slate-600 hover:bg-slate-100">{label}</NavLink>)}
           </nav>
+          <button
+            type="button"
+            onClick={logout}
+            className="mt-3 flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-950"
+          >
+            <LogOut size={16} strokeWidth={1.8} />
+            Sair
+          </button>
         </div>
         <Routes>
           <Route path="/" element={<Dashboard />} />
@@ -56,6 +79,22 @@ function App() {
         </Routes>
       </main>
     </div>
+  )
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route
+        path="/*"
+        element={
+          <ProtectedRoute>
+            <AppLayout />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
   )
 }
 
