@@ -56,15 +56,6 @@ export function Dashboard() {
     queryFn: buscarPendentes,
   })
 
-  console.log('Dashboard query state:', {
-    isPending: query.isPending,
-    isError: query.isError,
-    error: query.error,
-    data: query.data,
-    status: query.status,
-    fetchStatus: query.fetchStatus,
-  })
-
   const solicitacoes = query.data ?? []
 
   const ordenadas = [...solicitacoes].sort(
@@ -80,10 +71,7 @@ export function Dashboard() {
         {query.isPending ? (
           <p className="p-6 text-sm text-slate-500">Carregando...</p>
         ) : query.isError ? (
-          <div className="p-6">
-            <p className="text-sm text-destructive">Não foi possível carregar as solicitações pendentes.</p>
-            <p className="text-xs text-slate-400 mt-2">{query.error?.message}</p>
-          </div>
+          <p className="p-6 text-sm text-destructive">Não foi possível carregar as solicitações pendentes.</p>
         ) : ordenadas.length === 0 ? (
           <p className="p-6 text-sm text-slate-500">Nenhuma solicitação pendente</p>
         ) : (
