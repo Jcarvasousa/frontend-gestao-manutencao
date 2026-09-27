@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
 import type { Peca } from '@/types/Peca'
+import { UNIDADE_MEDIDA_LABELS } from '@/types/UnidadeMedida'
 
 const PAGE_SIZE = 10
 
@@ -118,7 +119,7 @@ export function Pecas() {
                     <TableCell>{peca.categoria ?? '—'}</TableCell>
                     <TableCell>
                       <span className="inline-flex items-center gap-2">
-                        {peca.quantidadeAtual} {peca.unidadeMedida}
+                        {peca.quantidadeAtual} {UNIDADE_MEDIDA_LABELS[peca.unidadeMedida] ?? peca.unidadeMedida}
                         {peca.abaixoDoMinimo && (
                           <Badge variant="destructive">
                             <AlertTriangle aria-hidden="true" />
@@ -128,7 +129,7 @@ export function Pecas() {
                       </span>
                     </TableCell>
                     <TableCell>
-                      {peca.estoqueMinimo != null ? `${peca.estoqueMinimo} ${peca.unidadeMedida}` : '—'}
+                      {peca.estoqueMinimo != null ? `${peca.estoqueMinimo} ${UNIDADE_MEDIDA_LABELS[peca.unidadeMedida] ?? peca.unidadeMedida}` : '—'}
                     </TableCell>
                     <TableCell>
                       {peca.custoUnitario != null ? currencyFormatter.format(peca.custoUnitario) : '—'}

@@ -5,6 +5,7 @@ import { buscarPecas } from '@/api/pecas'
 import { buscarManutencoes } from '@/api/manutencoes'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { MovimentacaoAjusteDialog } from '@/components/MovimentacaoAjusteDialog'
 import { MovimentacaoEntradaDialog } from '@/components/MovimentacaoEntradaDialog'
 import { MovimentacaoSaidaDialog } from '@/components/MovimentacaoSaidaDialog'
 import {
@@ -15,14 +16,14 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import type { TipoMovimentacao } from '@/types/MovimentacaoEstoque'
+import { TIPO_MOVIMENTACAO_INFO, type TipoMovimentacao } from '@/types/MovimentacaoEstoque'
 
 const PAGE_SIZE = 10
 
-const TIPO_OPTIONS: { value: TipoMovimentacao; label: string }[] = [
-  { value: 'ENTRADA', label: 'Entrada' },
-  { value: 'SAIDA', label: 'Saída' },
-]
+const TIPO_OPTIONS = (Object.keys(TIPO_MOVIMENTACAO_INFO) as TipoMovimentacao[]).map((value) => ({
+  value,
+  label: TIPO_MOVIMENTACAO_INFO[value].label,
+}))
 
 const currencyFormatter = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
@@ -40,6 +41,7 @@ export function Estoque() {
   const [manutencaoId, setManutencaoId] = useState('')
   const [isEntradaDialogOpen, setIsEntradaDialogOpen] = useState(false)
   const [isSaidaDialogOpen, setIsSaidaDialogOpen] = useState(false)
+  const [isAjusteDialogOpen, setIsAjusteDialogOpen] = useState(false)
 
   const pecasQuery = useQuery({
     queryKey: ['pecas', { page: 0, size: 100 }],
@@ -78,6 +80,9 @@ export function Estoque() {
       <h2 className="mt-2 text-3xl font-semibold tracking-tight">Movimentações</h2>
 
       <div className="mt-6 flex justify-end gap-3">
+        <Button variant="outline" onClick={() => setIsAjusteDialogOpen(true)}>
+          Ajustar estoque
+        </Button>
         <Button variant="outline" onClick={() => setIsSaidaDialogOpen(true)}>
           Registrar Saída
         </Button>
@@ -178,8 +183,8 @@ export function Estoque() {
                   <TableRow key={movimentacao.id}>
                     <TableCell className="font-medium">{movimentacao.pecaCodigo}</TableCell>
                     <TableCell>
-                      <Badge variant={movimentacao.tipo === 'ENTRADA' ? 'default' : 'destructive'}>
-                        {movimentacao.tipo === 'ENTRADA' ? 'Entrada' : 'Saída'}
+                      <Badge variant={TIPO_MOVIMENTACAO_INFO[movimentacao.tipo]?.badgeVariant ?? 'outline'}>
+                        {TIPO_MOVIMENTACAO_INFO[movimentacao.tipo]?.label ?? movimentacao.tipo}
                       </Badge>
                     </TableCell>
                     <TableCell>{movimentacao.quantidade}</TableCell>
@@ -232,6 +237,7 @@ export function Estoque() {
 
       <MovimentacaoEntradaDialog open={isEntradaDialogOpen} onOpenChange={setIsEntradaDialogOpen} />
       <MovimentacaoSaidaDialog open={isSaidaDialogOpen} onOpenChange={setIsSaidaDialogOpen} />
+      <MovimentacaoAjusteDialog open={isAjusteDialogOpen} onOpenChange={setIsAjusteDialogOpen} />
     </section>
   )
 }

@@ -12,7 +12,9 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Select } from '@/components/ui/select'
 import type { Peca, PecaFormValues, PecaPayload } from '@/types/Peca'
+import { UNIDADE_MEDIDA_OPTIONS, type UnidadeMedida } from '@/types/UnidadeMedida'
 
 interface PecaFormDialogProps {
   open: boolean
@@ -54,7 +56,7 @@ export function PecaFormDialog({ open, onOpenChange, peca }: PecaFormDialogProps
         codigo: formValues.codigo.trim(),
         nome: formValues.nome.trim(),
         categoria: formValues.categoria.trim() || null,
-        unidadeMedida: formValues.unidadeMedida.trim(),
+        unidadeMedida: formValues.unidadeMedida as UnidadeMedida,
         localizacaoFisica: formValues.localizacaoFisica.trim() || null,
         quantidadeAtual: formValues.quantidadeAtual,
         estoqueMinimo: formValues.estoqueMinimo === '' ? null : formValues.estoqueMinimo,
@@ -83,7 +85,7 @@ export function PecaFormDialog({ open, onOpenChange, peca }: PecaFormDialogProps
 
     if (!values.codigo.trim()) errors.codigo = 'Informe o código.'
     if (!values.nome.trim()) errors.nome = 'Informe o nome.'
-    if (!values.unidadeMedida.trim()) errors.unidadeMedida = 'Informe a unidade de medida.'
+    if (!values.unidadeMedida) errors.unidadeMedida = 'Informe a unidade de medida.'
     if (values.quantidadeAtual < 0) errors.quantidadeAtual = 'A quantidade não pode ser negativa.'
 
     setFieldErrors(errors)
@@ -142,12 +144,19 @@ export function PecaFormDialog({ open, onOpenChange, peca }: PecaFormDialogProps
 
           <div className="grid gap-2">
             <Label htmlFor="peca-unidade-medida">Unidade de Medida</Label>
-            <Input
+            <Select
               id="peca-unidade-medida"
+              placeholder="Selecione a unidade"
               value={values.unidadeMedida}
-              onChange={(event) => handleChange('unidadeMedida', event.target.value)}
+              onChange={(event) => handleChange('unidadeMedida', event.target.value as UnidadeMedida | '')}
               aria-invalid={Boolean(fieldErrors.unidadeMedida)}
-            />
+            >
+              {UNIDADE_MEDIDA_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </Select>
             {fieldErrors.unidadeMedida && <p className="text-sm text-destructive">{fieldErrors.unidadeMedida}</p>}
           </div>
 

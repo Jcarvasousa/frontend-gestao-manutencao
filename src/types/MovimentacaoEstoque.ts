@@ -1,4 +1,13 @@
-export type TipoMovimentacao = 'ENTRADA' | 'SAIDA'
+export type TipoMovimentacao = 'ENTRADA' | 'SAIDA' | 'AJUSTE'
+
+export const TIPO_MOVIMENTACAO_INFO: Record<
+	TipoMovimentacao,
+	{ label: string; badgeVariant: 'default' | 'destructive' | 'secondary' }
+> = {
+	ENTRADA: { label: 'Entrada', badgeVariant: 'default' },
+	SAIDA: { label: 'Saída', badgeVariant: 'destructive' },
+	AJUSTE: { label: 'Ajuste', badgeVariant: 'secondary' },
+}
 
 export interface MovimentacaoEstoque {
 	id: number
@@ -23,4 +32,10 @@ export interface MovimentacaoSaidaPayload {
 	manutencaoId: number
 	quantidade: number
 	observacao: string | null
+}
+
+export interface MovimentacaoAjustePayload {
+	pecaId: number
+	quantidadeNova: number
+	observacao: string
 }

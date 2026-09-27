@@ -1,9 +1,11 @@
+import type { UnidadeMedida } from '@/types/UnidadeMedida'
+
 export interface Peca {
 	id: number
 	codigo: string
 	nome: string
 	categoria: string | null
-	unidadeMedida: string
+	unidadeMedida: UnidadeMedida
 	localizacaoFisica: string | null
 	quantidadeAtual: number
 	estoqueMinimo: number | null
@@ -15,7 +17,7 @@ export interface PecaPayload {
 	codigo: string
 	nome: string
 	categoria: string | null
-	unidadeMedida: string
+	unidadeMedida: UnidadeMedida
 	localizacaoFisica: string | null
 	quantidadeAtual: number
 	estoqueMinimo: number | null
@@ -26,7 +28,7 @@ export interface PecaFormValues {
 	codigo: string
 	nome: string
 	categoria: string
-	unidadeMedida: string
+	unidadeMedida: UnidadeMedida | ''
 	localizacaoFisica: string
 	quantidadeAtual: number
 	estoqueMinimo: number | ''

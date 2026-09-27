@@ -1,6 +1,7 @@
 import { apiClient } from '@/api/client'
 import type { PageResponse } from '@/api/pecas'
 import type {
+  MovimentacaoAjustePayload,
   MovimentacaoEntradaPayload,
   MovimentacaoEstoque,
   MovimentacaoSaidaPayload,
@@ -27,5 +28,10 @@ export async function registrarEntrada(payload: MovimentacaoEntradaPayload): Pro
 
 export async function registrarSaida(payload: MovimentacaoSaidaPayload): Promise<MovimentacaoEstoque> {
   const { data } = await apiClient.post<MovimentacaoEstoque>('/movimentacoes-estoque/saida', payload)
+  return data
+}
+
+export async function registrarAjuste(payload: MovimentacaoAjustePayload): Promise<MovimentacaoEstoque> {
+  const { data } = await apiClient.post<MovimentacaoEstoque>('/movimentacoes-estoque/ajuste', payload)
   return data
 }
