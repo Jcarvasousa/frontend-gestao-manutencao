@@ -14,7 +14,7 @@ export interface Manutencao {
 	problemaDescricao: string
 	tipo: TipoManutencao
 	descricaoServico: string | null
-	custoMaoDeObra: number | null
+	custoMaoDeObra?: number | null
 	status: StatusManutencao
 	tecnicoResponsavel: string | null
 	dataAbertura: string
@@ -37,6 +37,7 @@ export interface ManutencaoFormValues {
 }
 
 export interface ManutencaoConcluirPayload {
-	descricaoServico: string | null
-	custoMaoDeObra: number | null
+	descricaoServico: string
+	maquinaLiberadaParaUso: boolean
+	condicoesSeguranca: string
 }

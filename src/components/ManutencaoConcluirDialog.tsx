@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import axios from 'axios'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { concluirManutencao } from '@/api/manutencoes'
 import { Button } from '@/components/ui/button'
@@ -10,8 +11,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Select } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import type { Manutencao, ManutencaoConcluirPayload } from '@/types/Manutencao'
 
@@ -23,33 +24,41 @@ interface ManutencaoConcluirDialogProps {
 
 interface ConcluirFormValues {
   descricaoServico: string
-  custoMaoDeObra: string
+  maquinaLiberadaParaUso: '' | 'sim' | 'nao'
+  condicoesSeguranca: string
 }
+
+type FieldErrors = Partial<Record<keyof ConcluirFormValues, string>>
 
 function valoresIniciais(): ConcluirFormValues {
   return {
     descricaoServico: '',
-    custoMaoDeObra: '',
+    maquinaLiberadaParaUso: '',
+    condicoesSeguranca: '',
   }
+}
+
+function mensagemDeErro(error: unknown): string {
+  if (axios.isAxiosError<{ mensagem?: string }>(error)) {
+    const mensagem = error.response?.data?.mensagem
+    if (mensagem) return mensagem
+  }
+  return 'Não foi possível concluir a manutenção. Tente novamente.'
 }
 
 export function ManutencaoConcluirDialog({ open, onOpenChange, manutencao }: ManutencaoConcluirDialogProps) {
   const queryClient = useQueryClient()
   const [values, setValues] = useState<ConcluirFormValues>(() => valoresIniciais())
-
-  useEffect(() => {
-    if (open) {
-      setValues(valoresIniciais())
-    }
-  }, [open, manutencao])
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
 
   const mutation = useMutation({
     mutationFn: async (formValues: ConcluirFormValues) => {
       if (!manutencao) return
 
       const payload: ManutencaoConcluirPayload = {
-        descricaoServico: formValues.descricaoServico.trim() || null,
-        custoMaoDeObra: formValues.custoMaoDeObra.trim() ? Number(formValues.custoMaoDeObra) : null,
+        descricaoServico: formValues.descricaoServico.trim(),
+        maquinaLiberadaParaUso: formValues.maquinaLiberadaParaUso === 'sim',
+        condicoesSeguranca: formValues.condicoesSeguranca.trim(),
       }
 
       return concluirManutencao(manutencao.id, payload)
@@ -60,8 +69,35 @@ export function ManutencaoConcluirDialog({ open, onOpenChange, manutencao }: Man
     },
   })
 
+  const { reset: resetMutation } = mutation
+
+  useEffect(() => {
+    if (open) {
+      setValues(valoresIniciais())
+      setFieldErrors({})
+      resetMutation()
+    }
+  }, [open, manutencao, resetMutation])
+
+  function handleChange<Field extends keyof ConcluirFormValues>(field: Field, value: ConcluirFormValues[Field]) {
+    setValues((currentValues) => ({
+      ...currentValues,
+      [field]: value,
+    }))
+    setFieldErrors((currentErrors) => ({ ...currentErrors, [field]: undefined }))
+  }
+
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    const errors: FieldErrors = {}
+
+    if (!values.descricaoServico.trim()) errors.descricaoServico = 'Informe a descrição do serviço.'
+    if (!values.maquinaLiberadaParaUso) errors.maquinaLiberadaParaUso = 'Informe se a máquina está liberada para uso.'
+    if (!values.condicoesSeguranca.trim()) errors.condicoesSeguranca = 'Informe as condições de segurança.'
+
+    setFieldErrors(errors)
+    if (Object.keys(errors).length > 0) return
+
     mutation.mutate(values)
   }
 
@@ -77,7 +113,7 @@ export function ManutencaoConcluirDialog({ open, onOpenChange, manutencao }: Man
 
         {mutation.isError && (
           <p className="text-sm text-destructive" role="alert">
-            Não foi possível concluir a manutenção. Tente novamente.
+            {mensagemDeErro(mutation.error)}
           </p>
         )}
 
@@ -87,20 +123,45 @@ export function ManutencaoConcluirDialog({ open, onOpenChange, manutencao }: Man
             <Textarea
               id="concluir-descricao"
               value={values.descricaoServico}
-              onChange={(event) => setValues((current) => ({ ...current, descricaoServico: event.target.value }))}
+              onChange={(event) => handleChange('descricaoServico', event.target.value)}
+              aria-invalid={Boolean(fieldErrors.descricaoServico)}
             />
+            {fieldErrors.descricaoServico && (
+              <p className="text-sm text-destructive">{fieldErrors.descricaoServico}</p>
+            )}
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="concluir-custo">Custo de mão de obra</Label>
-            <Input
-              id="concluir-custo"
-              type="number"
-              min="0"
-              step="0.01"
-              value={values.custoMaoDeObra}
-              onChange={(event) => setValues((current) => ({ ...current, custoMaoDeObra: event.target.value }))}
+            <Label htmlFor="concluir-liberada">Máquina liberada para uso?</Label>
+            <Select
+              id="concluir-liberada"
+              placeholder="Selecione..."
+              value={values.maquinaLiberadaParaUso}
+              onChange={(event) =>
+                handleChange('maquinaLiberadaParaUso', event.target.value as ConcluirFormValues['maquinaLiberadaParaUso'])
+              }
+              aria-invalid={Boolean(fieldErrors.maquinaLiberadaParaUso)}
+            >
+              <option value="sim">Sim</option>
+              <option value="nao">Não</option>
+            </Select>
+            {fieldErrors.maquinaLiberadaParaUso && (
+              <p className="text-sm text-destructive">{fieldErrors.maquinaLiberadaParaUso}</p>
+            )}
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="concluir-seguranca">Condições de segurança (NR12)</Label>
+            <Textarea
+              id="concluir-seguranca"
+              value={values.condicoesSeguranca}
+              onChange={(event) => handleChange('condicoesSeguranca', event.target.value)}
+              placeholder="Descreva as condições de segurança verificadas (bloqueio/etiquetagem, EPIs, proteções, etc.)"
+              aria-invalid={Boolean(fieldErrors.condicoesSeguranca)}
             />
+            {fieldErrors.condicoesSeguranca && (
+              <p className="text-sm text-destructive">{fieldErrors.condicoesSeguranca}</p>
+            )}
           </div>
 
           <DialogFooter>
