@@ -167,7 +167,7 @@ export function Maquinas() {
                 <TableRow key={maquina.id}>
                   <TableCell className="font-medium">{maquina.codigo}</TableCell>
                   <TableCell>{maquina.descricao}</TableCell>
-                  <TableCell>{maquina.setor ?? '—'}</TableCell>
+                  <TableCell>{maquina.setorNome ?? '—'}</TableCell>
                   <TableCell>
                     <StatusSelect maquina={maquina} />
                   </TableCell>

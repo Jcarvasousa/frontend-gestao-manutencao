@@ -4,7 +4,8 @@ export interface Maquina {
 	id: number
 	codigo: string
 	descricao: string
-	setor: string | null
+	setorId: number | null
+	setorNome: string | null
 	status: StatusMaquina
 	criadaEm: string
 	atualizadaEm: string
@@ -13,11 +14,11 @@ export interface Maquina {
 export interface MaquinaPayload {
 	codigo: string
 	descricao: string
-	setor: string | null
+	setorId: number | null
 }
 
 export interface MaquinaFormValues {
 	codigo: string
 	descricao: string
-	setor: string
+	setorId: number | null
 }

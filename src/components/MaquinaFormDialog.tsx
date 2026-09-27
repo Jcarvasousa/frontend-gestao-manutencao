@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { atualizarMaquina, criarMaquina } from '@/api/maquinas'
+import { buscarSetores } from '@/api/setores'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -26,7 +27,7 @@ function valoresIniciais(maquina?: Maquina | null): MaquinaFormValues {
   return {
     codigo: maquina?.codigo ?? '',
     descricao: maquina?.descricao ?? '',
-    setor: maquina?.setor ?? '',
+    setorId: maquina?.setorId ?? null,
   }
 }
 
@@ -43,12 +44,18 @@ export function MaquinaFormDialog({ open, onOpenChange, maquina }: MaquinaFormDi
     }
   }, [open, maquina])
 
+  const setoresQuery = useQuery({
+    queryKey: ['setores'],
+    queryFn: buscarSetores,
+    enabled: open,
+  })
+
   const mutation = useMutation({
     mutationFn: async (formValues: MaquinaFormValues) => {
       const payload: MaquinaPayload = {
         codigo: formValues.codigo.trim(),
         descricao: formValues.descricao.trim(),
-        setor: formValues.setor.trim() || null,
+        setorId: formValues.setorId,
       }
 
       return isEditing && maquina ? atualizarMaquina(maquina.id, payload) : criarMaquina(payload)
@@ -80,6 +87,8 @@ export function MaquinaFormDialog({ open, onOpenChange, maquina }: MaquinaFormDi
     mutation.mutate(values)
   }
 
+  const setores = setoresQuery.data ?? []
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
@@ -110,11 +119,21 @@ export function MaquinaFormDialog({ open, onOpenChange, maquina }: MaquinaFormDi
 
           <div className="grid gap-2">
             <Label htmlFor="maquina-setor">Setor</Label>
-            <Input
+            <select
               id="maquina-setor"
-              value={values.setor}
-              onChange={(event) => handleChange('setor', event.target.value)}
-            />
+              value={values.setorId ?? ''}
+              onChange={(event) =>
+                handleChange('setorId', event.target.value ? Number(event.target.value) : null)
+              }
+              className="h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm"
+            >
+              <option value="">Selecione um setor</option>
+              {setores.map((setor) => (
+                <option key={setor.id} value={setor.id}>
+                  {setor.nome}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="grid gap-2 sm:col-span-2">
