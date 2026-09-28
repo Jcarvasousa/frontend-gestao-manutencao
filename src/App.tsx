@@ -1,10 +1,11 @@
-import { BarChart3, Box, ClipboardList, Cog, FileText, LayoutDashboard, LogOut, ShoppingCart, Users, Wallet } from 'lucide-react'
+import { BarChart3, Box, ClipboardList, Cog, FileText, Factory, LayoutDashboard, LogOut, ShoppingCart, Users, Wallet } from 'lucide-react'
 import { NavLink, Route, Routes } from 'react-router-dom'
 import { Dashboard } from '@/pages/Dashboard'
 import { Maquinas } from '@/pages/Maquinas'
 import { Pecas } from '@/pages/Pecas'
 import { Manutencoes } from '@/pages/Manutencoes'
 import { Tecnicos } from '@/pages/Tecnicos'
+import { Setores } from '@/pages/Setores'
 import { Estoque } from '@/pages/Estoque'
 import { Compras } from '@/pages/Compras'
 import { Relatorios } from '@/pages/Relatorios'
@@ -16,6 +17,7 @@ import { useAuth } from '@/context/AuthContext'
 const navigation = [
   { label: 'Dashboard', path: '/', icon: LayoutDashboard },
   { label: 'Máquinas', path: '/maquinas', icon: Cog },
+  { label: 'Setores', path: '/setores', icon: Factory },
   { label: 'Peças', path: '/pecas', icon: Box },
   { label: 'Manutenções', path: '/manutencoes', icon: ClipboardList },
   { label: 'Técnicos', path: '/tecnicos', icon: Users },
@@ -72,6 +74,7 @@ function AppLayout() {
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/maquinas" element={<Maquinas />} />
+          <Route path="/setores" element={<Setores />} />
           <Route path="/pecas" element={<Pecas />} />
           <Route path="/manutencoes" element={<Manutencoes />} />
           <Route path="/tecnicos" element={<Tecnicos />} />
