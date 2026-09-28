@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { buscarPecas } from '@/api/pecas'
-import { buscarSolicitacoes, marcarComoRecebida } from '@/api/solicitacoesCompra'
+import { buscarSolicitacoes } from '@/api/solicitacoesCompra'
 import { Button } from '@/components/ui/button'
+import { ReceberCompraDialog } from '@/components/ReceberCompraDialog'
 import { SolicitacaoCompraFormDialog } from '@/components/SolicitacaoCompraFormDialog'
 import {
   Table,
@@ -37,24 +38,15 @@ function formatarMoeda(valor: number): string {
 }
 
 export function ReceberButton({ solicitacao }: { solicitacao: SolicitacaoCompra }) {
-  const queryClient = useQueryClient()
-
-  const mutation = useMutation({
-    mutationFn: () => marcarComoRecebida(solicitacao.id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['solicitacoes'] })
-      queryClient.invalidateQueries({ queryKey: ['solicitacoes-pendentes'] })
-      queryClient.invalidateQueries({ queryKey: ['pecas'] })
-    },
-    onError: (error) => {
-      console.error('Falha ao marcar solicitação como recebida', error)
-    },
-  })
+  const [open, setOpen] = useState(false)
 
   return (
-    <Button size="sm" disabled={mutation.isPending} onClick={() => mutation.mutate()}>
-      {mutation.isPending ? 'Salvando...' : 'Marcar como Recebida'}
-    </Button>
+    <>
+      <Button size="sm" onClick={() => setOpen(true)}>
+        Marcar como Recebida
+      </Button>
+      <ReceberCompraDialog solicitacao={solicitacao} open={open} onOpenChange={setOpen} />
+    </>
   )
 }
 

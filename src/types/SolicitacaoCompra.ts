@@ -35,3 +35,7 @@ export interface SolicitacaoCompraFormValues {
 	fornecedor: string
 	valorOrcamento: number | ''
 }
+
+export interface ReceberSolicitacaoPayload {
+	valorOrcamento: number
+}

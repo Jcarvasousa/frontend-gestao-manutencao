@@ -1,6 +1,7 @@
 import { apiClient } from '@/api/client'
 import type { PageResponse } from '@/api/pecas'
 import type {
+  ReceberSolicitacaoPayload,
   SolicitacaoCompra,
   SolicitacaoCompraPayload,
   StatusSolicitacaoCompra,
@@ -27,8 +28,14 @@ export async function criarSolicitacao(payload: SolicitacaoCompraPayload): Promi
   return data
 }
 
-export async function marcarComoRecebida(id: number): Promise<SolicitacaoCompra> {
-  const { data } = await apiClient.patch<SolicitacaoCompra>(`/solicitacoes-compra/${id}/receber`)
+export async function marcarComoRecebida(
+  id: number,
+  payload: ReceberSolicitacaoPayload,
+): Promise<SolicitacaoCompra> {
+  const { data } = await apiClient.patch<SolicitacaoCompra>(
+    `/solicitacoes-compra/${id}/receber`,
+    payload,
+  )
   return data
 }
 
