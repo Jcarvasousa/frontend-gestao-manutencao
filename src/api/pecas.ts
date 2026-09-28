@@ -16,6 +16,8 @@ export interface PecasFiltro {
   size?: number
   categoria?: string
   codigo?: string
+  busca?: string
+  sort?: string
 }
 
 export async function buscarPecas(filtro: PecasFiltro): Promise<PageResponse<Peca>> {

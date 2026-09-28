@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { buscarPecas } from '@/api/pecas'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { registrarEntrada } from '@/api/movimentacoes'
+import { PecaSelect } from '@/components/PecaSelect'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -48,12 +48,6 @@ export function MovimentacaoEntradaDialog({ open, onOpenChange }: MovimentacaoEn
     }
   }, [open])
 
-  const pecasQuery = useQuery({
-    queryKey: ['pecas', { page: 0, size: 100 }],
-    queryFn: () => buscarPecas({ page: 0, size: 100 }),
-    enabled: open,
-  })
-
   const mutation = useMutation({
     mutationFn: async (formValues: EntradaFormValues) => {
       const payload: MovimentacaoEntradaPayload = {
@@ -92,8 +86,6 @@ export function MovimentacaoEntradaDialog({ open, onOpenChange }: MovimentacaoEn
     mutation.mutate(values)
   }
 
-  const pecas = pecasQuery.data?.content ?? []
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
@@ -111,20 +103,12 @@ export function MovimentacaoEntradaDialog({ open, onOpenChange }: MovimentacaoEn
         <form className="grid gap-4" onSubmit={handleSubmit}>
           <div className="grid gap-2">
             <Label htmlFor="entrada-peca">Peça</Label>
-            <select
+            <PecaSelect
               id="entrada-peca"
               value={values.pecaId}
-              onChange={(event) => handleChange('pecaId', event.target.value)}
-              aria-invalid={Boolean(fieldErrors.pecaId)}
-              className="h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm"
-            >
-              <option value="">Selecione...</option>
-              {pecas.map((peca) => (
-                <option key={peca.id} value={peca.id}>
-                  {peca.codigo} - {peca.nome}
-                </option>
-              ))}
-            </select>
+              onChange={(pecaId) => handleChange('pecaId', pecaId)}
+              invalid={Boolean(fieldErrors.pecaId)}
+            />
             {fieldErrors.pecaId && <p className="text-sm text-destructive">{fieldErrors.pecaId}</p>}
           </div>
 
