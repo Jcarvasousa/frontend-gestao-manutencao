@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { buscarMovimentacoes } from '@/api/movimentacoes'
-import { buscarPecas } from '@/api/pecas'
 import { buscarManutencoes } from '@/api/manutencoes'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { MovimentacaoAjusteDialog } from '@/components/MovimentacaoAjusteDialog'
 import { MovimentacaoEntradaDialog } from '@/components/MovimentacaoEntradaDialog'
 import { MovimentacaoSaidaDialog } from '@/components/MovimentacaoSaidaDialog'
+import { PecaSelect } from '@/components/PecaSelect'
 import {
   Table,
   TableBody,
@@ -43,11 +43,6 @@ export function Estoque() {
   const [isSaidaDialogOpen, setIsSaidaDialogOpen] = useState(false)
   const [isAjusteDialogOpen, setIsAjusteDialogOpen] = useState(false)
 
-  const pecasQuery = useQuery({
-    queryKey: ['pecas', { page: 0, size: 100 }],
-    queryFn: () => buscarPecas({ page: 0, size: 100 }),
-  })
-
   const manutencoesQuery = useQuery({
     queryKey: ['manutencoes', { page: 0, size: 100 }],
     queryFn: () => buscarManutencoes({ page: 0, size: 100 }),
@@ -71,7 +66,6 @@ export function Estoque() {
   const paginaAtual = (query.data?.number ?? page) + 1
   const totalPaginas = query.data?.totalPages ?? 0
   const movimentacoes = query.data?.content ?? []
-  const pecas = pecasQuery.data?.content ?? []
   const manutencoes = manutencoesQuery.data?.content ?? []
 
   return (
@@ -115,22 +109,16 @@ export function Estoque() {
           <label className="mb-1.5 block text-sm font-medium" htmlFor="filtro-peca">
             Peça
           </label>
-          <select
+          <PecaSelect
             id="filtro-peca"
             value={pecaId}
-            onChange={(event) => {
-              setPecaId(event.target.value)
+            onChange={(id) => {
+              setPecaId(id)
               setPage(0)
             }}
-            className="h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm"
-          >
-            <option value="">Todas</option>
-            {pecas.map((peca) => (
-              <option key={peca.id} value={peca.id}>
-                {peca.codigo} - {peca.nome}
-              </option>
-            ))}
-          </select>
+            placeholder="Todas as peças"
+            clearable
+          />
         </div>
         <div className="flex-1">
           <label className="mb-1.5 block text-sm font-medium" htmlFor="filtro-manutencao">

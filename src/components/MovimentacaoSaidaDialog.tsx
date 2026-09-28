@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { buscarPecas } from '@/api/pecas'
 import { buscarManutencoes } from '@/api/manutencoes'
 import { registrarSaida } from '@/api/movimentacoes'
+import { PecaSelect } from '@/components/PecaSelect'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -50,12 +50,6 @@ export function MovimentacaoSaidaDialog({ open, onOpenChange }: MovimentacaoSaid
       setFieldErrors({})
     }
   }, [open])
-
-  const pecasQuery = useQuery({
-    queryKey: ['pecas', { page: 0, size: 100 }],
-    queryFn: () => buscarPecas({ page: 0, size: 100 }),
-    enabled: open,
-  })
 
   const manutencoesAbertasQuery = useQuery({
     queryKey: ['manutencoes', { page: 0, size: 100, status: 'ABERTA' }],
@@ -109,7 +103,6 @@ export function MovimentacaoSaidaDialog({ open, onOpenChange }: MovimentacaoSaid
     mutation.mutate(values)
   }
 
-  const pecas = pecasQuery.data?.content ?? []
   const manutencoes = [
     ...(manutencoesAbertasQuery.data?.content ?? []),
     ...(manutencoesEmAndamentoQuery.data?.content ?? []),
@@ -132,20 +125,12 @@ export function MovimentacaoSaidaDialog({ open, onOpenChange }: MovimentacaoSaid
         <form className="grid gap-4" onSubmit={handleSubmit}>
           <div className="grid gap-2">
             <Label htmlFor="saida-peca">Peça</Label>
-            <select
+            <PecaSelect
               id="saida-peca"
               value={values.pecaId}
-              onChange={(event) => handleChange('pecaId', event.target.value)}
-              aria-invalid={Boolean(fieldErrors.pecaId)}
-              className="h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm"
-            >
-              <option value="">Selecione...</option>
-              {pecas.map((peca) => (
-                <option key={peca.id} value={peca.id}>
-                  {peca.codigo} - {peca.nome}
-                </option>
-              ))}
-            </select>
+              onChange={(pecaId) => handleChange('pecaId', pecaId)}
+              invalid={Boolean(fieldErrors.pecaId)}
+            />
             {fieldErrors.pecaId && <p className="text-sm text-destructive">{fieldErrors.pecaId}</p>}
           </div>
 

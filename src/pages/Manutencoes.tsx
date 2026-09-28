@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { buscarMaquinas } from '@/api/maquinas'
 import { buscarManutencoes, iniciarManutencao } from '@/api/manutencoes'
+import { MaquinaSelect } from '@/components/MaquinaSelect'
 import { Button } from '@/components/ui/button'
 import { ManutencaoFormDialog } from '@/components/ManutencaoFormDialog'
 import { ManutencaoConcluirDialog } from '@/components/ManutencaoConcluirDialog'
@@ -70,11 +70,6 @@ export function Manutencoes() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [manutencaoAConcluir, setManutencaoAConcluir] = useState<Manutencao | null>(null)
 
-  const maquinasQuery = useQuery({
-    queryKey: ['maquinas', { page: 0, size: 100 }],
-    queryFn: () => buscarMaquinas({ page: 0, size: 100 }),
-  })
-
   const query = useQuery({
     queryKey: [
       'manutencoes',
@@ -93,7 +88,6 @@ export function Manutencoes() {
   const paginaAtual = (query.data?.number ?? page) + 1
   const totalPaginas = query.data?.totalPages ?? 0
   const manutencoes = query.data?.content ?? []
-  const maquinas = maquinasQuery.data?.content ?? []
 
   return (
     <section className="mx-auto max-w-6xl px-6 py-10">
@@ -151,22 +145,16 @@ export function Manutencoes() {
           <label className="mb-1.5 block text-sm font-medium" htmlFor="filtro-maquina">
             Máquina
           </label>
-          <select
+          <MaquinaSelect
             id="filtro-maquina"
             value={maquinaId}
-            onChange={(event) => {
-              setMaquinaId(event.target.value)
+            onChange={(id) => {
+              setMaquinaId(id)
               setPage(0)
             }}
-            className="h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm"
-          >
-            <option value="">Todas</option>
-            {maquinas.map((maquina) => (
-              <option key={maquina.id} value={maquina.id}>
-                {maquina.codigo} - {maquina.descricao}
-              </option>
-            ))}
-          </select>
+            placeholder="Todas as máquinas"
+            clearable
+          />
         </div>
       </div>
 

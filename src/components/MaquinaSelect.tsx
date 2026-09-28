@@ -2,14 +2,13 @@ import { useEffect, useState } from 'react'
 import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query'
 import { Combobox } from '@base-ui/react/combobox'
 import { X } from 'lucide-react'
-import { buscarPecas } from '@/api/pecas'
+import { buscarMaquinas } from '@/api/maquinas'
 import { cn } from '@/lib/utils'
-import { UNIDADE_MEDIDA_LABELS } from '@/types/UnidadeMedida'
-import type { Peca } from '@/types/Peca'
+import type { Maquina, StatusMaquina } from '@/types/Maquina'
 
-interface PecaSelectProps {
+interface MaquinaSelectProps {
   value: string
-  onChange: (pecaId: string, peca: Peca | null) => void
+  onChange: (maquinaId: string, maquina: Maquina | null) => void
   id?: string
   invalid?: boolean
   disabled?: boolean
@@ -20,26 +19,33 @@ interface PecaSelectProps {
 const TAMANHO_LISTA = 100
 const ORDENACAO = 'codigo,asc'
 
-function rotuloPeca(peca: Peca) {
-  return `${peca.codigo} - ${peca.nome}`
+const STATUS_LABELS: Record<StatusMaquina, string> = {
+  ATIVA: 'Ativa',
+  PARADA: 'Parada',
+  EM_MANUTENCAO: 'Em manutenção',
+  INATIVA: 'Inativa',
 }
 
-export function PecaSelect({
+function rotuloMaquina(maquina: Maquina) {
+  return `${maquina.codigo} - ${maquina.descricao}`
+}
+
+export function MaquinaSelect({
   value,
   onChange,
   id,
   invalid,
   disabled,
-  placeholder = 'Buscar por código, nome ou categoria...',
+  placeholder = 'Buscar por código, descrição ou setor...',
   clearable,
-}: PecaSelectProps) {
+}: MaquinaSelectProps) {
   const [aberto, setAberto] = useState(false)
-  const [selecionada, setSelecionada] = useState<Peca | null>(null)
+  const [selecionada, setSelecionada] = useState<Maquina | null>(null)
   const [inputValue, setInputValue] = useState('')
   const [digitado, setDigitado] = useState('')
   const [busca, setBusca] = useState('')
 
-  // Reset externo (ex.: dialog reaberto): value volta para '' enquanto ainda há peça guardada.
+  // Reset externo (ex.: dialog reaberto): value volta para '' enquanto ainda há máquina guardada.
   if (value === '' && selecionada !== null) {
     setSelecionada(null)
     setInputValue('')
@@ -53,10 +59,10 @@ export function PecaSelect({
   }, [digitado])
 
   const query = useInfiniteQuery({
-    queryKey: ['pecas', 'select', { busca, sort: ORDENACAO }],
+    queryKey: ['maquinas', 'select', { busca, sort: ORDENACAO }],
     initialPageParam: 0,
     queryFn: ({ pageParam }) =>
-      buscarPecas({
+      buscarMaquinas({
         busca: busca || undefined,
         page: pageParam,
         size: TAMANHO_LISTA,
@@ -67,7 +73,7 @@ export function PecaSelect({
     placeholderData: keepPreviousData,
   })
 
-  const pecas = query.data?.pages.flatMap((pagina) => pagina.content) ?? []
+  const maquinas = query.data?.pages.flatMap((pagina) => pagina.content) ?? []
   const totalElements = query.data?.pages[0]?.totalElements ?? 0
   const buscando = query.isFetching || digitado.trim() !== busca
   const podeLimpar = Boolean(clearable && selecionada && !disabled)
@@ -81,13 +87,13 @@ export function PecaSelect({
   }
 
   return (
-    <Combobox.Root<Peca>
-      items={pecas}
-      filteredItems={pecas}
+    <Combobox.Root<Maquina>
+      items={maquinas}
+      filteredItems={maquinas}
       value={selecionada}
-      onValueChange={(peca) => {
-        setSelecionada(peca)
-        onChange(peca ? String(peca.id) : '', peca)
+      onValueChange={(maquina) => {
+        setSelecionada(maquina)
+        onChange(maquina ? String(maquina.id) : '', maquina)
       }}
       inputValue={inputValue}
       onInputValueChange={(texto, details) => {
@@ -96,7 +102,7 @@ export function PecaSelect({
       }}
       open={aberto}
       onOpenChange={setAberto}
-      itemToStringLabel={rotuloPeca}
+      itemToStringLabel={rotuloMaquina}
       isItemEqualToValue={(a, b) => a.id === b.id}
       disabled={disabled}
     >
@@ -126,28 +132,22 @@ export function PecaSelect({
         <Combobox.Positioner sideOffset={4} className="z-[60]">
           <Combobox.Popup className="max-h-64 w-(--anchor-width) overflow-y-auto rounded-lg bg-popover text-sm text-popover-foreground shadow-md ring-1 ring-foreground/10">
             <Combobox.Empty className="px-2.5 py-2 text-sm text-muted-foreground empty:hidden">
-              {buscando ? 'Buscando...' : 'Nenhuma peça encontrada'}
+              {buscando ? 'Buscando...' : 'Nenhuma máquina encontrada'}
             </Combobox.Empty>
             <Combobox.List className="p-1">
-              {(peca: Peca) => (
+              {(maquina: Maquina) => (
                 <Combobox.Item
-                  key={peca.id}
-                  value={peca}
+                  key={maquina.id}
+                  value={maquina}
                   className={cn(
                     'flex cursor-default flex-col gap-0.5 rounded-md px-2 py-1.5 outline-none select-none',
                     'data-highlighted:bg-accent data-highlighted:text-accent-foreground',
                     'data-selected:font-medium',
                   )}
                 >
-                  <span>{rotuloPeca(peca)}</span>
+                  <span>{rotuloMaquina(maquina)}</span>
                   <span className="text-xs text-muted-foreground">
-                    {[
-                      peca.categoria,
-                      UNIDADE_MEDIDA_LABELS[peca.unidadeMedida],
-                      `Saldo: ${peca.quantidadeAtual}`,
-                    ]
-                      .filter(Boolean)
-                      .join(' · ')}
+                    {[maquina.setorNome, STATUS_LABELS[maquina.status]].filter(Boolean).join(' · ')}
                   </span>
                 </Combobox.Item>
               )}
@@ -155,7 +155,7 @@ export function PecaSelect({
             {query.hasNextPage && (
               <div className="flex items-center justify-between gap-2 border-t px-2.5 py-1.5 text-xs text-muted-foreground">
                 <span>
-                  Mostrando {pecas.length} de {totalElements}.
+                  Mostrando {maquinas.length} de {totalElements}.
                 </span>
                 <button
                   type="button"

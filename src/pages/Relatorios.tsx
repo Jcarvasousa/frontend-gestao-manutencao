@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { buscarMaquinas } from '@/api/maquinas'
+import { MaquinaSelect } from '@/components/MaquinaSelect'
 import { RelatorioCustoMensalCard } from '@/components/RelatorioCustoMensalCard'
 import { RelatorioCustoMaquinaCard } from '@/components/RelatorioCustoMaquinaCard'
 import { RelatorioOrcamentoMensalCard } from '@/components/RelatorioOrcamentoMensalCard'
@@ -13,13 +12,6 @@ export function Relatorios() {
   const [mes, setMes] = useState(dataAtual.getMonth() + 1)
   const [ano, setAno] = useState(dataAtual.getFullYear())
   const [maquinaId, setMaquinaId] = useState('')
-
-  const maquinasQuery = useQuery({
-    queryKey: ['maquinas', { page: 0, size: 100 }],
-    queryFn: () => buscarMaquinas({ page: 0, size: 100 }),
-  })
-
-  const maquinas = maquinasQuery.data?.content ?? []
 
   return (
     <section className="mx-auto max-w-6xl px-6 py-10">
@@ -65,19 +57,13 @@ export function Relatorios() {
           <label className="mb-1.5 block text-sm font-medium" htmlFor="filtro-maquina">
             Máquina
           </label>
-          <select
+          <MaquinaSelect
             id="filtro-maquina"
             value={maquinaId}
-            onChange={(event) => setMaquinaId(event.target.value)}
-            className="h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm"
-          >
-            <option value="">Selecione...</option>
-            {maquinas.map((maquina) => (
-              <option key={maquina.id} value={maquina.id}>
-                {maquina.codigo} - {maquina.descricao}
-              </option>
-            ))}
-          </select>
+            onChange={(id) => setMaquinaId(id)}
+            placeholder="Selecione uma máquina"
+            clearable
+          />
         </div>
       </div>
 

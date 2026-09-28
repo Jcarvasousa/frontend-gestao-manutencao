@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { buscarPecas } from '@/api/pecas'
 import { buscarSolicitacoes } from '@/api/solicitacoesCompra'
+import { PecaSelect } from '@/components/PecaSelect'
 import { Button } from '@/components/ui/button'
 import { ReceberCompraDialog } from '@/components/ReceberCompraDialog'
 import { SolicitacaoCompraFormDialog } from '@/components/SolicitacaoCompraFormDialog'
@@ -56,11 +56,6 @@ export function Compras() {
   const [pecaId, setPecaId] = useState('')
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
 
-  const pecasQuery = useQuery({
-    queryKey: ['pecas', { page: 0, size: 100 }],
-    queryFn: () => buscarPecas({ page: 0, size: 100 }),
-  })
-
   const query = useQuery({
     queryKey: [
       'solicitacoes',
@@ -78,7 +73,6 @@ export function Compras() {
   const paginaAtual = (query.data?.number ?? page) + 1
   const totalPaginas = query.data?.totalPages ?? 0
   const solicitacoes = query.data?.content ?? []
-  const pecas = pecasQuery.data?.content ?? []
 
   return (
     <section className="mx-auto max-w-6xl px-6 py-10">
@@ -115,22 +109,16 @@ export function Compras() {
           <label className="mb-1.5 block text-sm font-medium" htmlFor="filtro-peca">
             Peça
           </label>
-          <select
+          <PecaSelect
             id="filtro-peca"
             value={pecaId}
-            onChange={(event) => {
-              setPecaId(event.target.value)
+            onChange={(id) => {
+              setPecaId(id)
               setPage(0)
             }}
-            className="h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm"
-          >
-            <option value="">Todas</option>
-            {pecas.map((peca) => (
-              <option key={peca.id} value={peca.id}>
-                {peca.codigo} - {peca.nome}
-              </option>
-            ))}
-          </select>
+            placeholder="Todas as peças"
+            clearable
+          />
         </div>
       </div>
 

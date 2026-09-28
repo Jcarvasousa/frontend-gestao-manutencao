@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { buscarMaquinas } from '@/api/maquinas'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { criarManutencao } from '@/api/manutencoes'
+import { MaquinaSelect } from '@/components/MaquinaSelect'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -48,12 +48,6 @@ export function ManutencaoFormDialog({ open, onOpenChange }: ManutencaoFormDialo
     }
   }, [open])
 
-  const maquinasQuery = useQuery({
-    queryKey: ['maquinas', { page: 0, size: 100 }],
-    queryFn: () => buscarMaquinas({ page: 0, size: 100 }),
-    enabled: open,
-  })
-
   const mutation = useMutation({
     mutationFn: async (formValues: ManutencaoFormValues) => {
       const payload: ManutencaoPayload = {
@@ -92,8 +86,6 @@ export function ManutencaoFormDialog({ open, onOpenChange }: ManutencaoFormDialo
     mutation.mutate(values)
   }
 
-  const maquinas = maquinasQuery.data?.content ?? []
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
@@ -111,20 +103,12 @@ export function ManutencaoFormDialog({ open, onOpenChange }: ManutencaoFormDialo
         <form className="grid gap-4 sm:grid-cols-2" onSubmit={handleSubmit}>
           <div className="grid gap-2">
             <Label htmlFor="manutencao-maquina">Máquina</Label>
-            <select
+            <MaquinaSelect
               id="manutencao-maquina"
               value={values.maquinaId}
-              onChange={(event) => handleChange('maquinaId', event.target.value)}
-              aria-invalid={Boolean(fieldErrors.maquinaId)}
-              className="h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm"
-            >
-              <option value="">Selecione...</option>
-              {maquinas.map((maquina) => (
-                <option key={maquina.id} value={maquina.id}>
-                  {maquina.codigo} - {maquina.descricao}
-                </option>
-              ))}
-            </select>
+              onChange={(maquinaId) => handleChange('maquinaId', maquinaId)}
+              invalid={Boolean(fieldErrors.maquinaId)}
+            />
             {fieldErrors.maquinaId && <p className="text-sm text-destructive">{fieldErrors.maquinaId}</p>}
           </div>
 

@@ -8,6 +8,8 @@ export interface MaquinasFiltro {
   status?: StatusMaquina
   setor?: string
   codigo?: string
+  busca?: string
+  sort?: string
 }
 
 export async function buscarMaquinas(filtro: MaquinasFiltro): Promise<PageResponse<Maquina>> {

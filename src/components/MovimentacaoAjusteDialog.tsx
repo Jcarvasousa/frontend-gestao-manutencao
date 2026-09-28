@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
-import axios from 'axios'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { buscarPecas } from '@/api/pecas'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { registrarAjuste } from '@/api/movimentacoes'
+import { PecaSelect } from '@/components/PecaSelect'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -14,9 +13,10 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Select } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { mensagemDeErro } from '@/lib/erros'
 import type { MovimentacaoAjustePayload } from '@/types/MovimentacaoEstoque'
+import type { Peca } from '@/types/Peca'
 import { UNIDADE_MEDIDA_LABELS } from '@/types/UnidadeMedida'
 
 interface MovimentacaoAjusteDialogProps {
@@ -40,24 +40,11 @@ function valoresIniciais(): AjusteFormValues {
   }
 }
 
-function mensagemDeErro(error: unknown): string {
-  if (axios.isAxiosError<{ mensagem?: string }>(error)) {
-    const mensagem = error.response?.data?.mensagem
-    if (mensagem) return mensagem
-  }
-  return 'Não foi possível registrar o ajuste. Verifique os dados e tente novamente.'
-}
-
 export function MovimentacaoAjusteDialog({ open, onOpenChange }: MovimentacaoAjusteDialogProps) {
   const queryClient = useQueryClient()
   const [values, setValues] = useState<AjusteFormValues>(() => valoresIniciais())
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
-
-  const pecasQuery = useQuery({
-    queryKey: ['pecas', { page: 0, size: 100 }],
-    queryFn: () => buscarPecas({ page: 0, size: 100 }),
-    enabled: open,
-  })
+  const [pecaSelecionada, setPecaSelecionada] = useState<Peca | null>(null)
 
   const mutation = useMutation({
     mutationFn: async (formValues: AjusteFormValues) => {
@@ -82,6 +69,7 @@ export function MovimentacaoAjusteDialog({ open, onOpenChange }: MovimentacaoAju
     if (open) {
       setValues(valoresIniciais())
       setFieldErrors({})
+      setPecaSelecionada(null)
       resetMutation()
     }
   }, [open, resetMutation])
@@ -111,9 +99,6 @@ export function MovimentacaoAjusteDialog({ open, onOpenChange }: MovimentacaoAju
     mutation.mutate(values)
   }
 
-  const pecas = pecasQuery.data?.content ?? []
-  const pecaSelecionada = pecas.find((peca) => String(peca.id) === values.pecaId)
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
@@ -124,26 +109,22 @@ export function MovimentacaoAjusteDialog({ open, onOpenChange }: MovimentacaoAju
 
         {mutation.isError && (
           <p className="text-sm text-destructive" role="alert">
-            {mensagemDeErro(mutation.error)}
+            {mensagemDeErro(mutation.error, 'Não foi possível registrar o ajuste. Verifique os dados e tente novamente.')}
           </p>
         )}
 
         <form className="grid gap-4" onSubmit={handleSubmit}>
           <div className="grid gap-2">
             <Label htmlFor="ajuste-peca">Peça</Label>
-            <Select
+            <PecaSelect
               id="ajuste-peca"
-              placeholder="Selecione..."
               value={values.pecaId}
-              onChange={(event) => handleChange('pecaId', event.target.value)}
-              aria-invalid={Boolean(fieldErrors.pecaId)}
-            >
-              {pecas.map((peca) => (
-                <option key={peca.id} value={peca.id}>
-                  {peca.codigo} - {peca.nome}
-                </option>
-              ))}
-            </Select>
+              onChange={(pecaId, peca) => {
+                handleChange('pecaId', pecaId)
+                setPecaSelecionada(peca)
+              }}
+              invalid={Boolean(fieldErrors.pecaId)}
+            />
             {fieldErrors.pecaId && <p className="text-sm text-destructive">{fieldErrors.pecaId}</p>}
             {pecaSelecionada && (
               <p className="text-sm text-slate-500">
