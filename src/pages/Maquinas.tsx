@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Pencil } from 'lucide-react'
 import { atualizarStatusMaquina, buscarMaquinas } from '@/api/maquinas'
+import { buscarSetores } from '@/api/setores'
 import { Button } from '@/components/ui/button'
 import { MaquinaFormDialog } from '@/components/MaquinaFormDialog'
 import {
@@ -14,6 +15,7 @@ import {
 } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
 import type { Maquina, StatusMaquina } from '@/types/Maquina'
+import type { Setor } from '@/types/Setor'
 
 const PAGE_SIZE = 10
 
@@ -54,36 +56,47 @@ function StatusSelect({ maquina }: { maquina: Maquina }) {
   )
 }
 
+function rotuloSetor(maquina: Maquina, setoresPorId: Map<number, Setor>): string {
+  if (!maquina.setorNome) return '—'
+  const setor = maquina.setorId !== null ? setoresPorId.get(maquina.setorId) : undefined
+  return setor && !setor.ativo ? `${maquina.setorNome} (inativo)` : maquina.setorNome
+}
+
 export function Maquinas() {
   const [page, setPage] = useState(0)
   const [status, setStatus] = useState<StatusMaquina | ''>('')
   const [setor, setSetor] = useState('')
   const [codigo, setCodigo] = useState('')
-  const [debouncedSetor, setDebouncedSetor] = useState('')
   const [debouncedCodigo, setDebouncedCodigo] = useState('')
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [maquinaEmEdicao, setMaquinaEmEdicao] = useState<Maquina | null>(null)
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
-      setDebouncedSetor(setor.trim())
       setDebouncedCodigo(codigo.trim())
       setPage(0)
     }, 300)
 
     return () => window.clearTimeout(timeout)
-  }, [setor, codigo])
+  }, [codigo])
 
   const query = useQuery({
-    queryKey: ['maquinas', { page, size: PAGE_SIZE, status: status || undefined, setor: debouncedSetor, codigo: debouncedCodigo }],
+    queryKey: ['maquinas', { page, size: PAGE_SIZE, status: status || undefined, setor, codigo: debouncedCodigo }],
     queryFn: () => buscarMaquinas({
       page,
       size: PAGE_SIZE,
       status: status || undefined,
-      setor: debouncedSetor || undefined,
+      setor: setor || undefined,
       codigo: debouncedCodigo || undefined,
     }),
   })
+
+  const setoresQuery = useQuery({
+    queryKey: ['setores', 'todos'],
+    queryFn: () => buscarSetores(),
+  })
+
+  const setoresPorId = new Map((setoresQuery.data ?? []).map((item) => [item.id, item]))
 
   const paginaAtual = (query.data?.number ?? page) + 1
   const totalPaginas = query.data?.totalPages ?? 0
@@ -124,12 +137,22 @@ export function Maquinas() {
           <label className="mb-1.5 block text-sm font-medium" htmlFor="filtro-setor">
             Setor
           </label>
-          <Input
+          <select
             id="filtro-setor"
             value={setor}
-            onChange={(event) => setSetor(event.target.value)}
-            placeholder="Filtrar por setor"
-          />
+            onChange={(event) => {
+              setSetor(event.target.value)
+              setPage(0)
+            }}
+            className="h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm"
+          >
+            <option value="">Todos</option>
+            {(setoresQuery.data ?? []).map((item) => (
+              <option key={item.id} value={item.nome}>
+                {item.ativo ? item.nome : `${item.nome} (inativo)`}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="flex-1">
           <label className="mb-1.5 block text-sm font-medium" htmlFor="filtro-codigo">
@@ -167,7 +190,7 @@ export function Maquinas() {
                 <TableRow key={maquina.id}>
                   <TableCell className="font-medium">{maquina.codigo}</TableCell>
                   <TableCell>{maquina.descricao}</TableCell>
-                  <TableCell>{maquina.setorNome ?? '—'}</TableCell>
+                  <TableCell>{rotuloSetor(maquina, setoresPorId)}</TableCell>
                   <TableCell>
                     <StatusSelect maquina={maquina} />
                   </TableCell>
