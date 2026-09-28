@@ -27,10 +27,19 @@ export function RelatorioGastoRealizadoCard({ mes, ano }: RelatorioGastoRealizad
         <p className="text-sm text-destructive">Não foi possível carregar o relatório.</p>
       ) : (
         <>
-          <dl>
+          <p className="mb-4 text-sm text-slate-500">Valor Gasto ({nomeMes(mes)}/{ano})</p>
+          <dl className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div>
-              <dt className="text-sm text-slate-500">Valor Gasto ({nomeMes(mes)}/{ano})</dt>
-              <dd className="text-lg font-semibold">{currencyFormatter.format(query.data.valorGasto)}</dd>
+              <dt className="text-sm text-slate-500">Peças</dt>
+              <dd className="text-lg">{currencyFormatter.format(query.data.valorGastoPecas)}</dd>
+            </div>
+            <div>
+              <dt className="text-sm text-slate-500">Serviço de terceiros</dt>
+              <dd className="text-lg">{currencyFormatter.format(query.data.valorGastoServicoTerceiro)}</dd>
+            </div>
+            <div className="border-t pt-4 sm:border-l sm:border-t-0 sm:pl-4 sm:pt-0">
+              <dt className="text-sm text-slate-500">Total</dt>
+              <dd className="text-lg font-semibold">{currencyFormatter.format(query.data.valorGastoTotal)}</dd>
             </div>
           </dl>
           <div className="mt-4 flex justify-end">

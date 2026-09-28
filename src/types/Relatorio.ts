@@ -36,5 +36,7 @@ export interface RelatorioOrcamentoAnual {
 export interface RelatorioGastoRealizado {
   mes: number
   ano: number
-  valorGasto: number
+  valorGastoPecas: number
+  valorGastoServicoTerceiro: number
+  valorGastoTotal: number
 }
