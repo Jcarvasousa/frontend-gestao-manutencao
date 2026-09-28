@@ -24,6 +24,8 @@ export interface PecaPayload {
 	custoUnitario: number | null
 }
 
+export type PecaEdicaoPayload = Omit<PecaPayload, 'quantidadeAtual' | 'custoUnitario'>
+
 export interface PecaFormValues {
 	codigo: string
 	nome: string

@@ -13,8 +13,14 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
-import type { Peca, PecaFormValues, PecaPayload } from '@/types/Peca'
+import { mensagemDeErro } from '@/lib/erros'
+import type { Peca, PecaEdicaoPayload, PecaFormValues, PecaPayload } from '@/types/Peca'
 import { UNIDADE_MEDIDA_OPTIONS, type UnidadeMedida } from '@/types/UnidadeMedida'
+
+const currencyFormatter = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
+})
 
 interface PecaFormDialogProps {
   open: boolean
@@ -52,18 +58,23 @@ export function PecaFormDialog({ open, onOpenChange, peca }: PecaFormDialogProps
 
   const mutation = useMutation({
     mutationFn: async (formValues: PecaFormValues) => {
-      const payload: PecaPayload = {
+      const payloadEdicao: PecaEdicaoPayload = {
         codigo: formValues.codigo.trim(),
         nome: formValues.nome.trim(),
         categoria: formValues.categoria.trim() || null,
         unidadeMedida: formValues.unidadeMedida as UnidadeMedida,
         localizacaoFisica: formValues.localizacaoFisica.trim() || null,
-        quantidadeAtual: formValues.quantidadeAtual,
         estoqueMinimo: formValues.estoqueMinimo === '' ? null : formValues.estoqueMinimo,
-        custoUnitario: formValues.custoUnitario === '' ? null : formValues.custoUnitario,
       }
 
-      return isEditing && peca ? atualizarPeca(peca.id, payload) : criarPeca(payload)
+      if (isEditing && peca) return atualizarPeca(peca.id, payloadEdicao)
+
+      const payloadCriacao: PecaPayload = {
+        ...payloadEdicao,
+        quantidadeAtual: formValues.quantidadeAtual,
+        custoUnitario: formValues.custoUnitario === '' ? null : formValues.custoUnitario,
+      }
+      return criarPeca(payloadCriacao)
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['pecas'] })
@@ -86,7 +97,7 @@ export function PecaFormDialog({ open, onOpenChange, peca }: PecaFormDialogProps
     if (!values.codigo.trim()) errors.codigo = 'Informe o código.'
     if (!values.nome.trim()) errors.nome = 'Informe o nome.'
     if (!values.unidadeMedida) errors.unidadeMedida = 'Informe a unidade de medida.'
-    if (values.quantidadeAtual < 0) errors.quantidadeAtual = 'A quantidade não pode ser negativa.'
+    if (!isEditing && values.quantidadeAtual < 0) errors.quantidadeAtual = 'A quantidade não pode ser negativa.'
 
     setFieldErrors(errors)
     if (Object.keys(errors).length > 0) return
@@ -106,7 +117,7 @@ export function PecaFormDialog({ open, onOpenChange, peca }: PecaFormDialogProps
 
         {mutation.isError && (
           <p className="text-sm text-destructive" role="alert">
-            Não foi possível salvar a peça. Verifique os dados e tente novamente.
+            {mensagemDeErro(mutation.error, 'Não foi possível salvar a peça. Verifique os dados e tente novamente.')}
           </p>
         )}
 
@@ -171,16 +182,31 @@ export function PecaFormDialog({ open, onOpenChange, peca }: PecaFormDialogProps
 
           <div className="grid gap-2">
             <Label htmlFor="peca-quantidade-atual">Quantidade Atual</Label>
-            <Input
-              id="peca-quantidade-atual"
-              type="number"
-              min="0"
-              step="1"
-              value={values.quantidadeAtual}
-              onChange={(event) => handleChange('quantidadeAtual', Number(event.target.value))}
-              aria-invalid={Boolean(fieldErrors.quantidadeAtual)}
-            />
-            {fieldErrors.quantidadeAtual && <p className="text-sm text-destructive">{fieldErrors.quantidadeAtual}</p>}
+            {isEditing && peca ? (
+              <>
+                <p id="peca-quantidade-atual" className="text-sm font-medium">
+                  {peca.quantidadeAtual}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Alterado apenas por movimentações e ajustes de estoque.
+                </p>
+              </>
+            ) : (
+              <>
+                <Input
+                  id="peca-quantidade-atual"
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={values.quantidadeAtual}
+                  onChange={(event) => handleChange('quantidadeAtual', Number(event.target.value))}
+                  aria-invalid={Boolean(fieldErrors.quantidadeAtual)}
+                />
+                {fieldErrors.quantidadeAtual && (
+                  <p className="text-sm text-destructive">{fieldErrors.quantidadeAtual}</p>
+                )}
+              </>
+            )}
           </div>
 
           <div className="grid gap-2">
@@ -197,14 +223,25 @@ export function PecaFormDialog({ open, onOpenChange, peca }: PecaFormDialogProps
 
           <div className="grid gap-2">
             <Label htmlFor="peca-custo-unitario">Custo Unitário</Label>
-            <Input
-              id="peca-custo-unitario"
-              type="number"
-              min="0"
-              step="0.01"
-              value={values.custoUnitario}
-              onChange={(event) => handleChange('custoUnitario', event.target.value === '' ? '' : Number(event.target.value))}
-            />
+            {isEditing && peca ? (
+              <>
+                <p id="peca-custo-unitario" className="text-sm font-medium">
+                  {peca.custoUnitario != null ? currencyFormatter.format(peca.custoUnitario) : 'Sem custo'}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Atualizado automaticamente a cada compra recebida.
+                </p>
+              </>
+            ) : (
+              <Input
+                id="peca-custo-unitario"
+                type="number"
+                min="0"
+                step="0.01"
+                value={values.custoUnitario}
+                onChange={(event) => handleChange('custoUnitario', event.target.value === '' ? '' : Number(event.target.value))}
+              />
+            )}
           </div>
 
           <DialogFooter className="sm:col-span-2">

@@ -132,7 +132,7 @@ export function Pecas() {
                       {peca.estoqueMinimo != null ? `${peca.estoqueMinimo} ${UNIDADE_MEDIDA_LABELS[peca.unidadeMedida] ?? peca.unidadeMedida}` : '—'}
                     </TableCell>
                     <TableCell>
-                      {peca.custoUnitario != null ? currencyFormatter.format(peca.custoUnitario) : '—'}
+                      {peca.custoUnitario != null ? currencyFormatter.format(peca.custoUnitario) : 'Sem custo'}
                     </TableCell>
                     <TableCell>
                       <Button

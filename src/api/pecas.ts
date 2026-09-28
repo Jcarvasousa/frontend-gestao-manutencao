@@ -1,5 +1,5 @@
 import { apiClient } from '@/api/client'
-import type { Peca, PecaPayload } from '@/types/Peca'
+import type { Peca, PecaEdicaoPayload, PecaPayload } from '@/types/Peca'
 
 export interface PageResponse<T> {
   content: T[]
@@ -30,7 +30,7 @@ export async function criarPeca(payload: PecaPayload): Promise<Peca> {
   return data
 }
 
-export async function atualizarPeca(id: number, payload: PecaPayload): Promise<Peca> {
+export async function atualizarPeca(id: number, payload: PecaEdicaoPayload): Promise<Peca> {
   const { data } = await apiClient.put<Peca>(`/pecas/${id}`, payload)
   return data
 }
