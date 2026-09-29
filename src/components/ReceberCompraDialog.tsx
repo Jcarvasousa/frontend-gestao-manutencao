@@ -115,7 +115,7 @@ export function ReceberCompraDialog({ solicitacao, open, onOpenChange }: Receber
                   {formatadorMoeda.format(valorNumerico)} ÷ {solicitacao.quantidadeNecessaria} ={' '}
                   {formatadorMoeda.format(unitario)} por unidade
                 </p>
-                <p className="text-xs text-slate-500">Este será o novo custo unitário da peça.</p>
+                <p className="text-xs text-muted-foreground">Este será o novo custo unitário da peça.</p>
               </div>
             )}
           </div>

@@ -67,11 +67,11 @@ export function RelatorioCustoSetoresCard() {
 
       <div className="mt-6">
         {ids.length === 0 ? (
-          <p className="text-sm text-slate-500">Marque ao menos um setor para ver o custo detalhado.</p>
+          <p className="text-sm text-muted-foreground">Marque ao menos um setor para ver o custo detalhado.</p>
         ) : periodo.erro !== null ? (
           <p className="text-sm text-destructive">{periodo.erro}</p>
         ) : query.isPending ? (
-          <p className="text-sm text-slate-500">Carregando relatório por setor (pode levar alguns segundos)...</p>
+          <p className="text-sm text-muted-foreground">Carregando relatório por setor (pode levar alguns segundos)...</p>
         ) : query.isError ? (
           <p className="text-sm text-destructive">
             {mensagemDeErro(query.error, 'Não foi possível carregar o relatório.')}
@@ -121,6 +121,7 @@ export function RelatorioCustoSetoresCard() {
                     </TableRow>
                   </TableFooter>
                 </Table>
+                <p className="mt-2 text-xs text-muted-foreground">Mão de obra = técnicos + terceiros</p>
               </div>
               {/* Espaço reservado para o gráfico de rosca (lote de design). */}
               <div data-slot="grafico-rosca" className="w-full shrink-0 lg:w-72" />

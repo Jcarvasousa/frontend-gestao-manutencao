@@ -121,13 +121,13 @@ export function ManutencaoTecnicosSection({ manutencaoId, editavel }: Manutencao
 
       <div className="overflow-hidden rounded-lg border">
         {query.isPending ? (
-          <p className="p-4 text-sm text-slate-500">Carregando...</p>
+          <p className="p-4 text-sm text-muted-foreground">Carregando...</p>
         ) : query.isError ? (
           <p className="p-4 text-sm text-destructive">
             {mensagemDeErro(query.error, 'Não foi possível carregar os técnicos.')}
           </p>
         ) : vinculos.length === 0 ? (
-          <p className="p-4 text-sm text-slate-500">Nenhum técnico vinculado</p>
+          <p className="p-4 text-sm text-muted-foreground">Nenhum técnico vinculado</p>
         ) : (
           <Table>
             <TableHeader>

@@ -136,7 +136,7 @@ export function MovimentacaoAjusteDialog({ open, onOpenChange, peca = null }: Mo
             )}
             {fieldErrors.pecaId && <p className="text-sm text-destructive">{fieldErrors.pecaId}</p>}
             {pecaExibida && (
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-muted-foreground">
                 Saldo atual: {pecaExibida.quantidadeAtual}{' '}
                 {UNIDADE_MEDIDA_LABELS[pecaExibida.unidadeMedida] ?? pecaExibida.unidadeMedida}
               </p>

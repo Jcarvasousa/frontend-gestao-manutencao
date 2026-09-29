@@ -121,13 +121,13 @@ export function ManutencaoPecasSection({ manutencaoId, editavel }: ManutencaoPec
 
       <div className="overflow-hidden rounded-lg border">
         {query.isPending ? (
-          <p className="p-4 text-sm text-slate-500">Carregando...</p>
+          <p className="p-4 text-sm text-muted-foreground">Carregando...</p>
         ) : query.isError ? (
           <p className="p-4 text-sm text-destructive">
             {mensagemDeErro(query.error, 'Não foi possível carregar as peças usadas.')}
           </p>
         ) : pecasUsadas.length === 0 ? (
-          <p className="p-4 text-sm text-slate-500">Nenhuma peça usada nesta manutenção</p>
+          <p className="p-4 text-sm text-muted-foreground">Nenhuma peça usada nesta manutenção</p>
         ) : (
           <Table>
             <TableHeader>
@@ -195,7 +195,7 @@ export function ManutencaoPecasSection({ manutencaoId, editavel }: ManutencaoPec
             />
             {fieldErrors.pecaId && <p className="text-sm text-destructive">{fieldErrors.pecaId}</p>}
             {pecaSelecionada && (
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-muted-foreground">
                 Saldo atual: {pecaSelecionada.quantidadeAtual}{' '}
                 {UNIDADE_MEDIDA_LABELS[pecaSelecionada.unidadeMedida] ?? pecaSelecionada.unidadeMedida}
               </p>

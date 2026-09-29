@@ -176,13 +176,13 @@ export function ManutencaoTerceirosSection({
 
       <div className="overflow-hidden rounded-lg border">
         {query.isPending ? (
-          <p className="p-4 text-sm text-slate-500">Carregando...</p>
+          <p className="p-4 text-sm text-muted-foreground">Carregando...</p>
         ) : query.isError ? (
           <p className="p-4 text-sm text-destructive">
             {mensagemDeErro(query.error, 'Não foi possível carregar os serviços de terceiros.')}
           </p>
         ) : servicos.length === 0 ? (
-          <p className="p-4 text-sm text-slate-500">Nenhum serviço de terceiro registrado</p>
+          <p className="p-4 text-sm text-muted-foreground">Nenhum serviço de terceiro registrado</p>
         ) : (
           <Table>
             <TableHeader>
@@ -204,7 +204,7 @@ export function ManutencaoTerceirosSection({
                     <TableCell>{servico.fornecedor ?? '—'}</TableCell>
                     <TableCell>
                       <span className="block">{valor != null ? currencyFormatter.format(valor) : '—'}</span>
-                      <span className="block text-xs text-slate-500">
+                      <span className="block text-xs text-muted-foreground">
                         {origem === 'final' ? 'valor final' : 'valor apurado'}
                         {origem === 'apurado' && servico.horasTrabalhadas != null && servico.valorHora != null
                           ? ` (${horasFormatter.format(servico.horasTrabalhadas)} h × ${currencyFormatter.format(servico.valorHora)})`
@@ -347,7 +347,7 @@ export function ManutencaoTerceirosSection({
                 {fieldErrors.valorHora && <p className="text-sm text-destructive">{fieldErrors.valorHora}</p>}
               </div>
               {previaValida && (
-                <p className="text-sm text-slate-500 sm:col-span-2">
+                <p className="text-sm text-muted-foreground sm:col-span-2">
                   Prévia: {horasFormatter.format(horasPrevia)} h × {currencyFormatter.format(valorHoraPrevia)} ={' '}
                   {currencyFormatter.format(horasPrevia * valorHoraPrevia)} (o valor oficial é calculado pelo servidor)
                 </p>

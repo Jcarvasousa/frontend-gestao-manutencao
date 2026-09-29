@@ -28,14 +28,14 @@ export function Login() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm space-y-6">
         <div className="text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Gestão</p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">Manutenção</h1>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Gestão</p>
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-foreground">Manutenção</h1>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+        <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border border-border bg-card p-6">
           <div className="space-y-1.5">
             <Label htmlFor="username">Usuário</Label>
             <Input
@@ -59,14 +59,14 @@ export function Login() {
             />
           </div>
 
-          {erro && <p className="text-sm text-red-600">{erro}</p>}
+          {erro && <p className="text-sm text-destructive">{erro}</p>}
 
           <Button type="submit" className="w-full" disabled={carregando}>
             {carregando ? 'Entrando...' : 'Entrar'}
           </Button>
         </form>
 
-        <div className="rounded-lg border border-dashed border-slate-300 bg-slate-100 p-4 text-center text-sm text-slate-700">
+        <div className="rounded-lg border border-dashed border-border bg-muted p-4 text-center text-sm text-muted-foreground">
           Credenciais de demonstração: usuário <strong>demo</strong> / senha <strong>demo123</strong>
         </div>
       </div>

@@ -1,160 +1,77 @@
-import { useQuery } from '@tanstack/react-query'
-import { buscarKpis } from '@/api/relatorios'
-import { buscarPendentes } from '@/api/solicitacoesCompra'
-import { ReceberButton } from '@/pages/Compras'
-import { Badge } from '@/components/ui/badge'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-import type { SolicitacaoCompra, StatusSolicitacaoCompra } from '@/types/SolicitacaoCompra'
+import { useEffect, useState } from 'react'
+import { useIsFetching } from '@tanstack/react-query'
+import { mesPorExtenso } from '@/components/dashboard/formatos'
+import { ComprasPendentesCard } from '@/components/dashboard/ComprasPendentesCard'
+import { CustoMensalCard } from '@/components/dashboard/CustoMensalCard'
+import { KpiBacklog, KpiCustoMes, KpiMttr, KpiOrcamento } from '@/components/dashboard/KpiCards'
+import { PecasCard } from '@/components/dashboard/PecasCard'
+import { SetoresCard } from '@/components/dashboard/SetoresCard'
+import { StatusCard } from '@/components/dashboard/StatusCard'
+import { TipoCard } from '@/components/dashboard/TipoCard'
 
-const STATUS_LABELS: Record<StatusSolicitacaoCompra, string> = {
-  AGUARDANDO_ORCAMENTO: 'Aguardando orçamento',
-  APROVADA: 'Aprovada',
-  PEDIDO_REALIZADO: 'Pedido realizado',
-  RECEBIDA: 'Recebida',
-  CANCELADA: 'Cancelada',
+const LIMITE_LENTO_MS = 8000
+
+// Nota discreta se alguma consulta ainda sem dados passar de 8 s carregando (servidor de demonstração dormindo).
+function useCarregandoHaMuito(): boolean {
+  const pendentes = useIsFetching({ predicate: (query) => query.state.status === 'pending' })
+  const [lento, setLento] = useState(false)
+  const carregando = pendentes > 0
+
+  useEffect(() => {
+    if (!carregando) return
+    const timer = window.setTimeout(() => setLento(true), LIMITE_LENTO_MS)
+    return () => {
+      window.clearTimeout(timer)
+      setLento(false)
+    }
+  }, [carregando])
+
+  return carregando && lento
 }
-
-function formatarData(valor: string): string {
-  return new Date(valor).toLocaleDateString('pt-BR')
-}
-
-function calcularDiasEmAberto(dataSolicitacao: string): number {
-  const inicio = new Date(dataSolicitacao)
-  const hoje = new Date()
-  const diffMs = hoje.setHours(0, 0, 0, 0) - inicio.setHours(0, 0, 0, 0)
-  return Math.floor(diffMs / (1000 * 60 * 60 * 24))
-}
-
-function DiasEmAbertoBadge({ dias }: { dias: number }) {
-  if (dias > 7) {
-    return <Badge variant="destructive">{dias} dias</Badge>
-  }
-
-  if (dias >= 3) {
-    return (
-      <Badge
-        variant="outline"
-        className="border-yellow-300 bg-yellow-100 text-yellow-800 dark:border-yellow-800 dark:bg-yellow-950 dark:text-yellow-300"
-      >
-        {dias} dias
-      </Badge>
-    )
-  }
-
-  return <Badge variant="secondary">{dias} dias</Badge>
-}
-
-const horasFormatter = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 1 })
 
 export function Dashboard() {
-  const kpisQuery = useQuery({
-    queryKey: ['relatorios', 'kpis'],
-    queryFn: buscarKpis,
-  })
-
-  const query = useQuery({
-    queryKey: ['solicitacoes-pendentes'],
-    queryFn: buscarPendentes,
-  })
-
-  const solicitacoes = query.data ?? []
-
-  const ordenadas = [...solicitacoes].sort(
-    (a, b) => new Date(a.dataSolicitacao).getTime() - new Date(b.dataSolicitacao).getTime(),
-  )
+  // Mês atual do navegador, fixado na montagem da página.
+  const [hoje] = useState(() => new Date())
+  const mes = hoje.getMonth() + 1
+  const ano = hoje.getFullYear()
+  const demorando = useCarregandoHaMuito()
 
   return (
-    <section className="mx-auto max-w-6xl px-6 py-10">
-      <p className="text-sm font-medium text-slate-500">Módulo</p>
-      <h2 className="mt-2 text-3xl font-semibold tracking-tight">Dashboard</h2>
-
-      <div className="mt-8 grid gap-4 sm:grid-cols-2">
-        <div className="rounded-lg border bg-white p-5">
-          <p className="text-sm font-medium text-slate-500">Backlog de manutenções</p>
-          {kpisQuery.isPending ? (
-            <p className="mt-2 text-sm text-slate-500">Carregando...</p>
-          ) : kpisQuery.isError ? (
-            <p className="mt-2 text-sm text-destructive">Não foi possível carregar o indicador.</p>
-          ) : (
-            <p className="mt-2 text-3xl font-semibold tracking-tight">
-              {kpisQuery.data.backlogQuantidade}
-              <span className="ml-2 text-sm font-normal text-slate-500">
-                {kpisQuery.data.backlogQuantidade === 1 ? 'manutenção' : 'manutenções'}
-              </span>
-            </p>
-          )}
+    <section className="mx-auto max-w-[1200px] px-4 py-6 sm:px-6 lg:py-8">
+      <header className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className="text-2xl font-semibold tracking-tight text-foreground">Dashboard</h2>
+          <p className="mt-1 text-sm text-muted-foreground">Visão geral da manutenção</p>
         </div>
-        <div className="rounded-lg border bg-white p-5">
-          <p className="text-sm font-medium text-slate-500">MTTR (tempo médio de reparo)</p>
-          {kpisQuery.isPending ? (
-            <p className="mt-2 text-sm text-slate-500">Carregando...</p>
-          ) : kpisQuery.isError ? (
-            <p className="mt-2 text-sm text-destructive">Não foi possível carregar o indicador.</p>
-          ) : kpisQuery.data.mttrHoras == null ? (
-            <p className="mt-2 text-lg text-slate-500">Sem dados</p>
-          ) : (
-            <p className="mt-2 text-3xl font-semibold tracking-tight">
-              {horasFormatter.format(kpisQuery.data.mttrHoras)}
-              <span className="ml-2 text-sm font-normal text-slate-500">horas</span>
-            </p>
-          )}
+        <span className="rounded-full border border-border bg-surface px-3 py-1 text-xs text-muted-foreground">
+          Custos de referência: {mesPorExtenso(mes)}/{ano}
+        </span>
+      </header>
+
+      {demorando && (
+        <p role="status" className="mt-4 text-xs text-muted-foreground">
+          O servidor de demonstração pode levar até 1 minuto para acordar na primeira visita.
+        </p>
+      )}
+
+      <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <KpiBacklog />
+        <KpiMttr />
+        <div className="col-span-2 md:col-span-1">
+          <KpiOrcamento mes={mes} ano={ano} />
+        </div>
+        <div className="col-span-2 md:col-span-1">
+          <KpiCustoMes mes={mes} ano={ano} />
         </div>
       </div>
 
-      <h3 className="mt-10 text-lg font-semibold tracking-tight">Compras pendentes</h3>
-      <div className="mt-4 overflow-hidden rounded-lg border">
-        {query.isPending ? (
-          <p className="p-6 text-sm text-slate-500">Carregando...</p>
-        ) : query.isError ? (
-          <p className="p-6 text-sm text-destructive">Não foi possível carregar as solicitações pendentes.</p>
-        ) : ordenadas.length === 0 ? (
-          <p className="p-6 text-sm text-slate-500">Nenhuma solicitação pendente</p>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Peça</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Solicitado em</TableHead>
-                <TableHead>Dias em aberto</TableHead>
-                <TableHead>Ação</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {ordenadas.map((solicitacao: SolicitacaoCompra) => {
-                const finalizada = solicitacao.status === 'RECEBIDA' || solicitacao.status === 'CANCELADA'
-                const dias = calcularDiasEmAberto(solicitacao.dataSolicitacao)
-
-                return (
-                  <TableRow key={solicitacao.id}>
-                    <TableCell className="font-medium">
-                      {solicitacao.pecaCodigo} - {solicitacao.pecaNome}
-                    </TableCell>
-                    <TableCell>{STATUS_LABELS[solicitacao.status]}</TableCell>
-                    <TableCell>{formatarData(solicitacao.dataSolicitacao)}</TableCell>
-                    <TableCell>
-                      <DiasEmAbertoBadge dias={dias} />
-                    </TableCell>
-                    <TableCell>
-                      {finalizada ? (
-                        <span className="text-sm text-slate-500">Finalizada</span>
-                      ) : (
-                        <ReceberButton solicitacao={solicitacao} />
-                      )}
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
-        )}
+      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-12">
+        <StatusCard />
+        <PecasCard className="lg:col-span-5" />
+        <CustoMensalCard mes={mes} ano={ano} className="lg:col-span-7" />
+        <SetoresCard mes={mes} ano={ano} className="lg:col-span-6" />
+        <TipoCard className="lg:col-span-6" />
+        <ComprasPendentesCard />
       </div>
     </section>
   )

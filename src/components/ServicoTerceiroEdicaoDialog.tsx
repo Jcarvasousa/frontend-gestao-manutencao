@@ -118,7 +118,7 @@ export function ServicoTerceiroEdicaoDialog({ open, onOpenChange, servico }: Ser
               onChange={(event) => handleChange('valorFinal', event.target.value)}
               aria-invalid={Boolean(fieldErrors.valorFinal)}
             />
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-muted-foreground">
               {servico?.valorApurado != null
                 ? `Valor apurado: ${currencyFormatter.format(servico.valorApurado)}. `
                 : ''}

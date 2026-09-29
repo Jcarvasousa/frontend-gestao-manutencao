@@ -34,3 +34,8 @@ export async function atualizarPeca(id: number, payload: PecaEdicaoPayload): Pro
   const { data } = await apiClient.put<Peca>(`/pecas/${id}`, payload)
   return data
 }
+
+export async function buscarPecasAbaixoDoMinimo(): Promise<Peca[]> {
+  const { data } = await apiClient.get<Peca[]>('/pecas/abaixo-do-minimo')
+  return data
+}

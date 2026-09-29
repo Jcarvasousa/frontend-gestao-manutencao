@@ -22,23 +22,23 @@ export function RelatorioGastoRealizadoCard({ mes, ano }: RelatorioGastoRealizad
   return (
     <div className="rounded-lg border p-6">
       {query.isPending ? (
-        <p className="text-sm text-slate-500">Carregando...</p>
+        <p className="text-sm text-muted-foreground">Carregando...</p>
       ) : query.isError ? (
         <p className="text-sm text-destructive">Não foi possível carregar o relatório.</p>
       ) : (
         <>
-          <p className="mb-4 text-sm text-slate-500">Valor Gasto ({nomeMes(mes)}/{ano})</p>
+          <p className="mb-4 text-sm text-muted-foreground">Valor Gasto ({nomeMes(mes)}/{ano})</p>
           <dl className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div>
-              <dt className="text-sm text-slate-500">Peças</dt>
+              <dt className="text-sm text-muted-foreground">Peças</dt>
               <dd className="text-lg">{currencyFormatter.format(query.data.valorGastoPecas)}</dd>
             </div>
             <div>
-              <dt className="text-sm text-slate-500">Serviço de terceiros</dt>
+              <dt className="text-sm text-muted-foreground">Serviço de terceiros</dt>
               <dd className="text-lg">{currencyFormatter.format(query.data.valorGastoServicoTerceiro)}</dd>
             </div>
             <div className="border-t pt-4 sm:border-l sm:border-t-0 sm:pl-4 sm:pt-0">
-              <dt className="text-sm text-slate-500">Total</dt>
+              <dt className="text-sm text-muted-foreground">Total</dt>
               <dd className="text-lg font-semibold">{currencyFormatter.format(query.data.valorGastoTotal)}</dd>
             </div>
           </dl>

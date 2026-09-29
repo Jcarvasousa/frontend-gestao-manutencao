@@ -29,7 +29,7 @@ export function RelatorioOrcamentoMensalCard({ mes, ano }: RelatorioOrcamentoMen
   return (
     <div className="rounded-lg border p-6">
       {query.isPending ? (
-        <p className="text-sm text-slate-500">Carregando...</p>
+        <p className="text-sm text-muted-foreground">Carregando...</p>
       ) : query.isError ? (
         <p className="text-sm text-destructive">
           {naoEncontrado
@@ -40,19 +40,19 @@ export function RelatorioOrcamentoMensalCard({ mes, ano }: RelatorioOrcamentoMen
         <>
           <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div>
-              <dt className="text-sm text-slate-500">Valor Planejado ({nomeMes(mes)}/{ano})</dt>
+              <dt className="text-sm text-muted-foreground">Valor Planejado ({nomeMes(mes)}/{ano})</dt>
               <dd className="text-lg font-semibold">{currencyFormatter.format(query.data.valorPlanejado)}</dd>
             </div>
             <div>
-              <dt className="text-sm text-slate-500">Valor Realizado ({nomeMes(mes)}/{ano})</dt>
+              <dt className="text-sm text-muted-foreground">Valor Realizado ({nomeMes(mes)}/{ano})</dt>
               <dd className="text-lg font-semibold">{currencyFormatter.format(query.data.valorRealizado)}</dd>
             </div>
             <div>
-              <dt className="text-sm text-slate-500">Saldo Disponível</dt>
+              <dt className="text-sm text-muted-foreground">Saldo Disponível</dt>
               <dd className="text-lg font-semibold">{currencyFormatter.format(query.data.saldoDisponivel)}</dd>
             </div>
             <div>
-              <dt className="text-sm text-slate-500">Percentual Utilizado</dt>
+              <dt className="text-sm text-muted-foreground">Percentual Utilizado</dt>
               <dd className="text-lg font-semibold">{percentFormatter.format(query.data.percentualUtilizado)}%</dd>
             </div>
           </dl>

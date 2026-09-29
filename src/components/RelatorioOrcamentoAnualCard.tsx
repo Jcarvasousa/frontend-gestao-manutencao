@@ -24,26 +24,26 @@ export function RelatorioOrcamentoAnualCard({ ano }: RelatorioOrcamentoAnualCard
   return (
     <div className="rounded-lg border p-6">
       {query.isPending ? (
-        <p className="text-sm text-slate-500">Carregando...</p>
+        <p className="text-sm text-muted-foreground">Carregando...</p>
       ) : query.isError ? (
         <p className="text-sm text-destructive">Não foi possível carregar o relatório.</p>
       ) : (
         <>
           <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div>
-              <dt className="text-sm text-slate-500">Valor Planejado Total ({ano})</dt>
+              <dt className="text-sm text-muted-foreground">Valor Planejado Total ({ano})</dt>
               <dd className="text-lg font-semibold">{currencyFormatter.format(query.data.valorPlanejadoTotal)}</dd>
             </div>
             <div>
-              <dt className="text-sm text-slate-500">Valor Realizado Total ({ano})</dt>
+              <dt className="text-sm text-muted-foreground">Valor Realizado Total ({ano})</dt>
               <dd className="text-lg font-semibold">{currencyFormatter.format(query.data.valorRealizadoTotal)}</dd>
             </div>
             <div>
-              <dt className="text-sm text-slate-500">Saldo Disponível</dt>
+              <dt className="text-sm text-muted-foreground">Saldo Disponível</dt>
               <dd className="text-lg font-semibold">{currencyFormatter.format(query.data.saldoDisponivel)}</dd>
             </div>
             <div>
-              <dt className="text-sm text-slate-500">Percentual Utilizado</dt>
+              <dt className="text-sm text-muted-foreground">Percentual Utilizado</dt>
               <dd className="text-lg font-semibold">{percentFormatter.format(query.data.percentualUtilizado)}%</dd>
             </div>
           </dl>
