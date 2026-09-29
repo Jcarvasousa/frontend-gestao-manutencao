@@ -1,12 +1,39 @@
 import { apiClient } from '@/api/client'
 import type {
-  RelatorioCustoMaquina,
+  RelatorioCustoMaquinas,
   RelatorioCustoMensal,
+  RelatorioCustoSetores,
   RelatorioGastoRealizado,
   RelatorioKpis,
   RelatorioOrcamentoAnual,
   RelatorioOrcamentoMensal,
 } from '@/types/Relatorio'
+
+export interface CustoMaquinasFiltro {
+  maquinaIds: number[]
+  mes?: number
+  ano?: number
+}
+
+export interface CustoSetoresFiltro {
+  setorIds: number[]
+  mes?: number
+  ano?: number
+}
+
+function paramsCustoMaquinas({ maquinaIds, mes, ano }: CustoMaquinasFiltro) {
+  return { maquinaIds: maquinaIds.join(','), mes, ano }
+}
+
+function paramsCustoSetores({ setorIds, mes, ano }: CustoSetoresFiltro) {
+  return { setorIds: setorIds.join(','), mes, ano }
+}
+
+function sufixoPeriodo(mes?: number, ano?: number) {
+  if (mes !== undefined && ano !== undefined) return `${mes}-${ano}`
+  if (ano !== undefined) return `${ano}`
+  return 'total'
+}
 
 export async function buscarKpis(): Promise<RelatorioKpis> {
   const { data } = await apiClient.get<RelatorioKpis>('/relatorios/kpis')
@@ -18,23 +45,16 @@ export async function buscarCustoMensal(mes: number, ano: number): Promise<Relat
   return data
 }
 
-export async function buscarCustoMaquinaMensal(maquinaId: number, mes: number, ano: number): Promise<RelatorioCustoMaquina> {
-  const { data } = await apiClient.get<RelatorioCustoMaquina>('/relatorios/custo-maquina/mensal', {
-    params: { maquinaId, mes, ano },
+export async function buscarCustoMaquinas(filtro: CustoMaquinasFiltro): Promise<RelatorioCustoMaquinas> {
+  const { data } = await apiClient.get<RelatorioCustoMaquinas>('/relatorios/custo-maquinas', {
+    params: paramsCustoMaquinas(filtro),
   })
   return data
 }
 
-export async function buscarCustoMaquinaAnual(maquinaId: number, ano: number): Promise<RelatorioCustoMaquina> {
-  const { data } = await apiClient.get<RelatorioCustoMaquina>('/relatorios/custo-maquina/anual', {
-    params: { maquinaId, ano },
-  })
-  return data
-}
-
-export async function buscarCustoMaquinaTotal(maquinaId: number): Promise<RelatorioCustoMaquina> {
-  const { data } = await apiClient.get<RelatorioCustoMaquina>('/relatorios/custo-maquina/total', {
-    params: { maquinaId },
+export async function buscarCustoSetores(filtro: CustoSetoresFiltro): Promise<RelatorioCustoSetores> {
+  const { data } = await apiClient.get<RelatorioCustoSetores>('/relatorios/custo-setores', {
+    params: paramsCustoSetores(filtro),
   })
   return data
 }
@@ -60,7 +80,7 @@ export async function buscarGastoRealizado(mes: number, ano: number): Promise<Re
   return data
 }
 
-export async function baixarPdf(url: string, params: Record<string, string | number>, nomeArquivo: string) {
+export async function baixarPdf(url: string, params: Record<string, string | number | undefined>, nomeArquivo: string) {
   const response = await apiClient.get(url, { params, responseType: 'blob' })
   const blobUrl = window.URL.createObjectURL(new Blob([response.data]))
   const link = document.createElement('a')
@@ -76,27 +96,19 @@ export async function baixarCustoMensalPdf(mes: number, ano: number) {
   await baixarPdf('/relatorios/custo-mensal/pdf', { mes, ano }, `relatorio-custo-mensal-${mes}-${ano}.pdf`)
 }
 
-export async function baixarCustoMaquinaMensalPdf(maquinaId: number, mes: number, ano: number) {
+export async function baixarCustoMaquinasPdf(filtro: CustoMaquinasFiltro) {
   await baixarPdf(
-    '/relatorios/custo-maquina/mensal/pdf',
-    { maquinaId, mes, ano },
-    `relatorio-custo-maquina-mensal-${maquinaId}-${mes}-${ano}.pdf`,
+    '/relatorios/custo-maquinas/pdf',
+    paramsCustoMaquinas(filtro),
+    `relatorio-custo-maquinas-${sufixoPeriodo(filtro.mes, filtro.ano)}.pdf`,
   )
 }
 
-export async function baixarCustoMaquinaAnualPdf(maquinaId: number, ano: number) {
+export async function baixarCustoSetoresPdf(filtro: CustoSetoresFiltro) {
   await baixarPdf(
-    '/relatorios/custo-maquina/anual/pdf',
-    { maquinaId, ano },
-    `relatorio-custo-maquina-anual-${maquinaId}-${ano}.pdf`,
-  )
-}
-
-export async function baixarCustoMaquinaTotalPdf(maquinaId: number) {
-  await baixarPdf(
-    '/relatorios/custo-maquina/total/pdf',
-    { maquinaId },
-    `relatorio-custo-maquina-total-${maquinaId}.pdf`,
+    '/relatorios/custo-setores/pdf',
+    paramsCustoSetores(filtro),
+    `relatorio-custo-setores-${sufixoPeriodo(filtro.mes, filtro.ano)}.pdf`,
   )
 }
 

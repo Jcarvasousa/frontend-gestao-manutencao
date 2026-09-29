@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { MaquinaSelect } from '@/components/MaquinaSelect'
 import { RelatorioCustoMensalCard } from '@/components/RelatorioCustoMensalCard'
-import { RelatorioCustoMaquinaCard } from '@/components/RelatorioCustoMaquinaCard'
+import { RelatorioCustoMaquinasCard } from '@/components/RelatorioCustoMaquinasCard'
+import { RelatorioCustoSetoresCard } from '@/components/RelatorioCustoSetoresCard'
 import { RelatorioOrcamentoMensalCard } from '@/components/RelatorioOrcamentoMensalCard'
 import { RelatorioOrcamentoAnualCard } from '@/components/RelatorioOrcamentoAnualCard'
 import { RelatorioGastoRealizadoCard } from '@/components/RelatorioGastoRealizadoCard'
@@ -11,7 +11,6 @@ export function Relatorios() {
   const dataAtual = new Date()
   const [mes, setMes] = useState(dataAtual.getMonth() + 1)
   const [ano, setAno] = useState(dataAtual.getFullYear())
-  const [maquinaId, setMaquinaId] = useState('')
 
   return (
     <section className="mx-auto max-w-6xl px-6 py-10">
@@ -53,18 +52,6 @@ export function Relatorios() {
             ))}
           </select>
         </div>
-        <div className="flex-1">
-          <label className="mb-1.5 block text-sm font-medium" htmlFor="filtro-maquina">
-            Máquina
-          </label>
-          <MaquinaSelect
-            id="filtro-maquina"
-            value={maquinaId}
-            onChange={(id) => setMaquinaId(id)}
-            placeholder="Selecione uma máquina"
-            clearable
-          />
-        </div>
       </div>
 
       <div className="mt-10">
@@ -75,16 +62,17 @@ export function Relatorios() {
       </div>
 
       <div className="mt-10">
-        <h3 className="text-xl font-semibold tracking-tight">Custo por Máquina</h3>
-        {maquinaId === '' ? (
-          <p className="mt-4 text-sm text-slate-500">Selecione uma máquina para ver o custo detalhado</p>
-        ) : (
-          <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
-            <RelatorioCustoMaquinaCard maquinaId={Number(maquinaId)} modo="mensal" mes={mes} ano={ano} />
-            <RelatorioCustoMaquinaCard maquinaId={Number(maquinaId)} modo="anual" mes={mes} ano={ano} />
-            <RelatorioCustoMaquinaCard maquinaId={Number(maquinaId)} modo="total" mes={mes} ano={ano} />
-          </div>
-        )}
+        <h3 className="text-xl font-semibold tracking-tight">Custo por Máquinas</h3>
+        <div className="mt-4">
+          <RelatorioCustoMaquinasCard />
+        </div>
+      </div>
+
+      <div className="mt-10">
+        <h3 className="text-xl font-semibold tracking-tight">Custo por Setor</h3>
+        <div className="mt-4">
+          <RelatorioCustoSetoresCard />
+        </div>
       </div>
 
       <div className="mt-10">
