@@ -22,6 +22,7 @@ import { UNIDADE_MEDIDA_LABELS } from '@/types/UnidadeMedida'
 interface MovimentacaoAjusteDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
+  peca?: Peca | null
 }
 
 interface AjusteFormValues {
@@ -32,17 +33,17 @@ interface AjusteFormValues {
 
 type FieldErrors = Partial<Record<'pecaId' | 'quantidadeNova' | 'observacao', string>>
 
-function valoresIniciais(): AjusteFormValues {
+function valoresIniciais(peca?: Peca | null): AjusteFormValues {
   return {
-    pecaId: '',
+    pecaId: peca ? String(peca.id) : '',
     quantidadeNova: '',
     observacao: '',
   }
 }
 
-export function MovimentacaoAjusteDialog({ open, onOpenChange }: MovimentacaoAjusteDialogProps) {
+export function MovimentacaoAjusteDialog({ open, onOpenChange, peca = null }: MovimentacaoAjusteDialogProps) {
   const queryClient = useQueryClient()
-  const [values, setValues] = useState<AjusteFormValues>(() => valoresIniciais())
+  const [values, setValues] = useState<AjusteFormValues>(() => valoresIniciais(peca))
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [pecaSelecionada, setPecaSelecionada] = useState<Peca | null>(null)
 
@@ -67,12 +68,14 @@ export function MovimentacaoAjusteDialog({ open, onOpenChange }: MovimentacaoAju
 
   useEffect(() => {
     if (open) {
-      setValues(valoresIniciais())
+      setValues(valoresIniciais(peca))
       setFieldErrors({})
       setPecaSelecionada(null)
       resetMutation()
     }
-  }, [open, resetMutation])
+  }, [open, peca, resetMutation])
+
+  const pecaExibida = peca ?? pecaSelecionada
 
   function handleChange<Field extends keyof AjusteFormValues>(field: Field, value: AjusteFormValues[Field]) {
     setValues((currentValues) => ({
@@ -116,20 +119,26 @@ export function MovimentacaoAjusteDialog({ open, onOpenChange }: MovimentacaoAju
         <form className="grid gap-4" onSubmit={handleSubmit}>
           <div className="grid gap-2">
             <Label htmlFor="ajuste-peca">Peça</Label>
-            <PecaSelect
-              id="ajuste-peca"
-              value={values.pecaId}
-              onChange={(pecaId, peca) => {
-                handleChange('pecaId', pecaId)
-                setPecaSelecionada(peca)
-              }}
-              invalid={Boolean(fieldErrors.pecaId)}
-            />
+            {peca ? (
+              <p id="ajuste-peca" className="text-sm font-medium">
+                {peca.codigo} - {peca.nome}
+              </p>
+            ) : (
+              <PecaSelect
+                id="ajuste-peca"
+                value={values.pecaId}
+                onChange={(pecaId, pecaEscolhida) => {
+                  handleChange('pecaId', pecaId)
+                  setPecaSelecionada(pecaEscolhida)
+                }}
+                invalid={Boolean(fieldErrors.pecaId)}
+              />
+            )}
             {fieldErrors.pecaId && <p className="text-sm text-destructive">{fieldErrors.pecaId}</p>}
-            {pecaSelecionada && (
+            {pecaExibida && (
               <p className="text-sm text-slate-500">
-                Saldo atual: {pecaSelecionada.quantidadeAtual}{' '}
-                {UNIDADE_MEDIDA_LABELS[pecaSelecionada.unidadeMedida] ?? pecaSelecionada.unidadeMedida}
+                Saldo atual: {pecaExibida.quantidadeAtual}{' '}
+                {UNIDADE_MEDIDA_LABELS[pecaExibida.unidadeMedida] ?? pecaExibida.unidadeMedida}
               </p>
             )}
           </div>

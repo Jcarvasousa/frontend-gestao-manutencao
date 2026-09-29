@@ -4,6 +4,7 @@ import { AlertTriangle, Pencil } from 'lucide-react'
 import { buscarPecas } from '@/api/pecas'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { MovimentacaoAjusteDialog } from '@/components/MovimentacaoAjusteDialog'
 import { PecaFormDialog } from '@/components/PecaFormDialog'
 import {
   Table,
@@ -32,6 +33,7 @@ export function Pecas() {
   const [debouncedCodigo, setDebouncedCodigo] = useState('')
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [pecaEmEdicao, setPecaEmEdicao] = useState<Peca | null>(null)
+  const [pecaEmAjuste, setPecaEmAjuste] = useState<Peca | null>(null)
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -135,15 +137,25 @@ export function Pecas() {
                       {peca.custoUnitario != null ? currencyFormatter.format(peca.custoUnitario) : 'Sem custo'}
                     </TableCell>
                     <TableCell>
-                      <Button
-                        aria-label={`Editar peça ${peca.codigo}`}
-                        title={`Editar peça ${peca.codigo}`}
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setPecaEmEdicao(peca)}
-                      >
-                        <Pencil aria-hidden="true" />
-                      </Button>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          aria-label={`Editar peça ${peca.codigo}`}
+                          title={`Editar peça ${peca.codigo}`}
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setPecaEmEdicao(peca)}
+                        >
+                          <Pencil aria-hidden="true" />
+                        </Button>
+                        <Button
+                          aria-label={`Ajustar estoque da peça ${peca.codigo}`}
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setPecaEmAjuste(peca)}
+                        >
+                          Ajustar estoque
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
               ))}
@@ -187,6 +199,13 @@ export function Pecas() {
           if (!open) setPecaEmEdicao(null)
         }}
         peca={pecaEmEdicao}
+      />
+      <MovimentacaoAjusteDialog
+        open={Boolean(pecaEmAjuste)}
+        onOpenChange={(open) => {
+          if (!open) setPecaEmAjuste(null)
+        }}
+        peca={pecaEmAjuste}
       />
     </section>
   )

@@ -6,6 +6,7 @@ export interface TecnicosFiltro {
   page?: number
   size?: number
   nome?: string
+  sort?: string
 }
 
 export async function buscarTecnicos(filtro: TecnicosFiltro): Promise<PageResponse<Tecnico>> {

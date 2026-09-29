@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { mensagemDeErro } from '@/lib/erros'
 import type { ManutencaoFormValues, ManutencaoPayload, TipoManutencao } from '@/types/Manutencao'
 
 interface ManutencaoFormDialogProps {
@@ -32,7 +33,6 @@ function valoresIniciais(): ManutencaoFormValues {
     maquinaId: '',
     problemaDescricao: '',
     tipo: 'CORRETIVA',
-    tecnicoResponsavel: '',
   }
 }
 
@@ -41,20 +41,12 @@ export function ManutencaoFormDialog({ open, onOpenChange }: ManutencaoFormDialo
   const [values, setValues] = useState<ManutencaoFormValues>(() => valoresIniciais())
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
 
-  useEffect(() => {
-    if (open) {
-      setValues(valoresIniciais())
-      setFieldErrors({})
-    }
-  }, [open])
-
   const mutation = useMutation({
     mutationFn: async (formValues: ManutencaoFormValues) => {
       const payload: ManutencaoPayload = {
         maquinaId: Number(formValues.maquinaId),
         problemaDescricao: formValues.problemaDescricao.trim(),
         tipo: formValues.tipo,
-        tecnicoResponsavel: formValues.tecnicoResponsavel.trim() || null,
       }
 
       return criarManutencao(payload)
@@ -64,6 +56,16 @@ export function ManutencaoFormDialog({ open, onOpenChange }: ManutencaoFormDialo
       onOpenChange(false)
     },
   })
+
+  const { reset: resetMutation } = mutation
+
+  useEffect(() => {
+    if (open) {
+      setValues(valoresIniciais())
+      setFieldErrors({})
+      resetMutation()
+    }
+  }, [open, resetMutation])
 
   function handleChange<Field extends keyof ManutencaoFormValues>(field: Field, value: ManutencaoFormValues[Field]) {
     setValues((currentValues) => ({
@@ -96,7 +98,7 @@ export function ManutencaoFormDialog({ open, onOpenChange }: ManutencaoFormDialo
 
         {mutation.isError && (
           <p className="text-sm text-destructive" role="alert">
-            Não foi possível criar a manutenção. Verifique os dados e tente novamente.
+            {mensagemDeErro(mutation.error, 'Não foi possível criar a manutenção. Verifique os dados e tente novamente.')}
           </p>
         )}
 
@@ -137,15 +139,6 @@ export function ManutencaoFormDialog({ open, onOpenChange }: ManutencaoFormDialo
               aria-invalid={Boolean(fieldErrors.problemaDescricao)}
             />
             {fieldErrors.problemaDescricao && <p className="text-sm text-destructive">{fieldErrors.problemaDescricao}</p>}
-          </div>
-
-          <div className="grid gap-2 sm:col-span-2">
-            <Label htmlFor="manutencao-tecnico">Técnico responsável</Label>
-            <Input
-              id="manutencao-tecnico"
-              value={values.tecnicoResponsavel}
-              onChange={(event) => handleChange('tecnicoResponsavel', event.target.value)}
-            />
           </div>
 
           <DialogFooter className="sm:col-span-2">

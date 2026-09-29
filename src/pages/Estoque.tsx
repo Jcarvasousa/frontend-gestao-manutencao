@@ -4,9 +4,6 @@ import { buscarMovimentacoes } from '@/api/movimentacoes'
 import { buscarManutencoes } from '@/api/manutencoes'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { MovimentacaoAjusteDialog } from '@/components/MovimentacaoAjusteDialog'
-import { MovimentacaoEntradaDialog } from '@/components/MovimentacaoEntradaDialog'
-import { MovimentacaoSaidaDialog } from '@/components/MovimentacaoSaidaDialog'
 import { PecaSelect } from '@/components/PecaSelect'
 import {
   Table,
@@ -39,9 +36,6 @@ export function Estoque() {
   const [tipo, setTipo] = useState<TipoMovimentacao | ''>('')
   const [pecaId, setPecaId] = useState('')
   const [manutencaoId, setManutencaoId] = useState('')
-  const [isEntradaDialogOpen, setIsEntradaDialogOpen] = useState(false)
-  const [isSaidaDialogOpen, setIsSaidaDialogOpen] = useState(false)
-  const [isAjusteDialogOpen, setIsAjusteDialogOpen] = useState(false)
 
   const manutencoesQuery = useQuery({
     queryKey: ['manutencoes', { page: 0, size: 100 }],
@@ -72,16 +66,6 @@ export function Estoque() {
     <section className="mx-auto max-w-6xl px-6 py-10">
       <p className="text-sm font-medium text-slate-500">Módulo</p>
       <h2 className="mt-2 text-3xl font-semibold tracking-tight">Movimentações</h2>
-
-      <div className="mt-6 flex justify-end gap-3">
-        <Button variant="outline" onClick={() => setIsAjusteDialogOpen(true)}>
-          Ajustar estoque
-        </Button>
-        <Button variant="outline" onClick={() => setIsSaidaDialogOpen(true)}>
-          Registrar Saída
-        </Button>
-        <Button onClick={() => setIsEntradaDialogOpen(true)}>Registrar Entrada</Button>
-      </div>
 
       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
         <div className="flex-1">
@@ -222,10 +206,6 @@ export function Estoque() {
           </div>
         </div>
       )}
-
-      <MovimentacaoEntradaDialog open={isEntradaDialogOpen} onOpenChange={setIsEntradaDialogOpen} />
-      <MovimentacaoSaidaDialog open={isSaidaDialogOpen} onOpenChange={setIsSaidaDialogOpen} />
-      <MovimentacaoAjusteDialog open={isAjusteDialogOpen} onOpenChange={setIsAjusteDialogOpen} />
     </section>
   )
 }

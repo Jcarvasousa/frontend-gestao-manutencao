@@ -5,6 +5,7 @@ import { MaquinaSelect } from '@/components/MaquinaSelect'
 import { Button } from '@/components/ui/button'
 import { ManutencaoFormDialog } from '@/components/ManutencaoFormDialog'
 import { ManutencaoConcluirDialog } from '@/components/ManutencaoConcluirDialog'
+import { ManutencaoDetalhesDialog } from '@/components/ManutencaoDetalhesDialog'
 import {
   Table,
   TableBody,
@@ -13,7 +14,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import type { Manutencao, StatusManutencao, TipoManutencao } from '@/types/Manutencao'
+import { invalidarDadosDeManutencao } from '@/lib/manutencaoQueries'
+import type { Manutencao,StatusManutencao, TipoManutencao } from '@/types/Manutencao'
 
 const PAGE_SIZE = 10
 
@@ -48,7 +50,7 @@ function IniciarButton({ manutencao }: { manutencao: Manutencao }) {
   const mutation = useMutation({
     mutationFn: () => iniciarManutencao(manutencao.id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['manutencoes'] })
+      invalidarDadosDeManutencao(queryClient)
     },
     onError: (error) => {
       console.error('Falha ao iniciar manutenção', error)
@@ -69,6 +71,7 @@ export function Manutencoes() {
   const [maquinaId, setMaquinaId] = useState('')
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [manutencaoAConcluir, setManutencaoAConcluir] = useState<Manutencao | null>(null)
+  const [manutencaoDetalhesId, setManutencaoDetalhesId] = useState<number | null>(null)
 
   const query = useQuery({
     queryKey: [
@@ -173,7 +176,6 @@ export function Manutencoes() {
                 <TableHead>Problema</TableHead>
                 <TableHead>Tipo</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Técnico</TableHead>
                 <TableHead>Data Abertura</TableHead>
                 <TableHead>Ações</TableHead>
               </TableRow>
@@ -188,19 +190,21 @@ export function Manutencoes() {
                     <TableCell>{manutencao.problemaDescricao}</TableCell>
                     <TableCell>{TIPO_LABELS[manutencao.tipo]}</TableCell>
                     <TableCell>{STATUS_LABELS[manutencao.status]}</TableCell>
-                    <TableCell>{manutencao.tecnicoResponsavel ?? '—'}</TableCell>
                     <TableCell>{formatarDataHora(manutencao.dataAbertura)}</TableCell>
                     <TableCell>
-                      {finalizada ? (
-                        <span className="text-sm text-slate-500">Finalizada</span>
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          {manutencao.status === 'ABERTA' && <IniciarButton manutencao={manutencao} />}
-                          <Button size="sm" onClick={() => setManutencaoAConcluir(manutencao)}>
-                            Concluir
-                          </Button>
-                        </div>
-                      )}
+                      <div className="flex items-center gap-2">
+                        <Button size="sm" variant="outline" onClick={() => setManutencaoDetalhesId(manutencao.id)}>
+                          Detalhes
+                        </Button>
+                        {!finalizada && (
+                          <>
+                            {manutencao.status === 'ABERTA' && <IniciarButton manutencao={manutencao} />}
+                            <Button size="sm" onClick={() => setManutencaoAConcluir(manutencao)}>
+                              Concluir
+                            </Button>
+                          </>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 )
@@ -236,6 +240,13 @@ export function Manutencoes() {
       )}
 
       <ManutencaoFormDialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen} />
+      <ManutencaoDetalhesDialog
+        open={manutencaoDetalhesId != null}
+        onOpenChange={(open) => {
+          if (!open) setManutencaoDetalhesId(null)
+        }}
+        manutencaoId={manutencaoDetalhesId}
+      />
       <ManutencaoConcluirDialog
         open={Boolean(manutencaoAConcluir)}
         onOpenChange={(open) => {

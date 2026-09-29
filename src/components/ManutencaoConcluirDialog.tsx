@@ -14,6 +14,8 @@ import {
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { mensagemDeErro } from '@/lib/erros'
+import { invalidarDadosDeManutencao } from '@/lib/manutencaoQueries'
 import type { Manutencao, ManutencaoConcluirPayload } from '@/types/Manutencao'
 
 interface ManutencaoConcluirDialogProps {
@@ -38,12 +40,15 @@ function valoresIniciais(): ConcluirFormValues {
   }
 }
 
-function mensagemDeErro(error: unknown): string {
-  if (axios.isAxiosError<{ mensagem?: string }>(error)) {
-    const mensagem = error.response?.data?.mensagem
-    if (mensagem) return mensagem
+const ERRO_PADRAO = 'Não foi possível concluir a manutenção. Tente novamente.'
+
+function mensagemDeConclusao(error: unknown): string {
+  const mensagem = mensagemDeErro(error, ERRO_PADRAO)
+  // O backend responde 409 quando não há técnico nem serviço de terceiro vinculado.
+  if (axios.isAxiosError(error) && error.response?.status === 409 && /respons[aá]vel|t[eé]cnico|terceiro/i.test(mensagem)) {
+    return `${mensagem} Vincule um técnico ou um serviço de terceiro na seção de Detalhes da manutenção e tente concluir novamente.`
   }
-  return 'Não foi possível concluir a manutenção. Tente novamente.'
+  return mensagem
 }
 
 export function ManutencaoConcluirDialog({ open, onOpenChange, manutencao }: ManutencaoConcluirDialogProps) {
@@ -64,7 +69,7 @@ export function ManutencaoConcluirDialog({ open, onOpenChange, manutencao }: Man
       return concluirManutencao(manutencao.id, payload)
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['manutencoes'] })
+      await invalidarDadosDeManutencao(queryClient)
       onOpenChange(false)
     },
   })
@@ -113,7 +118,7 @@ export function ManutencaoConcluirDialog({ open, onOpenChange, manutencao }: Man
 
         {mutation.isError && (
           <p className="text-sm text-destructive" role="alert">
-            {mensagemDeErro(mutation.error)}
+            {mensagemDeConclusao(mutation.error)}
           </p>
         )}
 
