@@ -37,12 +37,12 @@ function formatarMoeda(valor: number): string {
   return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
 
-export function ReceberButton({ solicitacao }: { solicitacao: SolicitacaoCompra }) {
+export function ReceberButton({ solicitacao, className }: { solicitacao: SolicitacaoCompra; className?: string }) {
   const [open, setOpen] = useState(false)
 
   return (
     <>
-      <Button size="sm" onClick={() => setOpen(true)}>
+      <Button size="sm" className={className} onClick={() => setOpen(true)}>
         Marcar como Recebida
       </Button>
       <ReceberCompraDialog solicitacao={solicitacao} open={open} onOpenChange={setOpen} />
@@ -76,7 +76,7 @@ export function Compras() {
 
   return (
     <section className="mx-auto max-w-6xl px-6 py-10">
-      <p className="text-sm font-medium text-slate-500">Módulo</p>
+      <p className="text-sm font-medium text-muted-foreground">Módulo</p>
       <h2 className="mt-2 text-3xl font-semibold tracking-tight">Compras</h2>
 
       <div className="mt-6 flex justify-end">
@@ -124,11 +124,11 @@ export function Compras() {
 
       <div className="mt-6 overflow-hidden rounded-lg border">
         {query.isPending ? (
-          <p className="p-6 text-sm text-slate-500">Carregando...</p>
+          <p className="p-6 text-sm text-muted-foreground">Carregando...</p>
         ) : query.isError ? (
           <p className="p-6 text-sm text-destructive">Não foi possível carregar as solicitações.</p>
         ) : solicitacoes.length === 0 ? (
-          <p className="p-6 text-sm text-slate-500">Nenhuma solicitação encontrada</p>
+          <p className="p-6 text-sm text-muted-foreground">Nenhuma solicitação encontrada</p>
         ) : (
           <Table>
             <TableHeader>
@@ -160,7 +160,7 @@ export function Compras() {
                     <TableCell>{formatarData(solicitacao.dataSolicitacao)}</TableCell>
                     <TableCell>
                       {finalizada ? (
-                        <span className="text-sm text-slate-500">Finalizada</span>
+                        <span className="text-sm text-muted-foreground">Finalizada</span>
                       ) : (
                         <ReceberButton solicitacao={solicitacao} />
                       )}
@@ -175,7 +175,7 @@ export function Compras() {
 
       {!query.isPending && !query.isError && query.data && (
         <div className="mt-4 flex flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-slate-500">{query.data.totalElements} registros</p>
+          <p className="text-muted-foreground">{query.data.totalElements} registros</p>
           <div className="flex items-center gap-3">
             <Button
               variant="outline"

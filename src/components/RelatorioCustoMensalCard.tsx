@@ -21,22 +21,22 @@ export function RelatorioCustoMensalCard({ mes, ano }: RelatorioCustoMensalCardP
   return (
     <div className="rounded-lg border p-6">
       {query.isPending ? (
-        <p className="text-sm text-slate-500">Carregando...</p>
+        <p className="text-sm text-muted-foreground">Carregando...</p>
       ) : query.isError ? (
         <p className="text-sm text-destructive">Não foi possível carregar o relatório.</p>
       ) : (
         <>
           <dl className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div>
-              <dt className="text-sm text-slate-500">Custo de Peças</dt>
+              <dt className="text-sm text-muted-foreground">Custo de Peças</dt>
               <dd className="text-lg font-semibold">{currencyFormatter.format(query.data.custoPecas)}</dd>
             </div>
             <div>
-              <dt className="text-sm text-slate-500">Custo de Mão de Obra</dt>
+              <dt className="text-sm text-muted-foreground">Custo de Mão de Obra</dt>
               <dd className="text-lg font-semibold">{currencyFormatter.format(query.data.custoMaoDeObra)}</dd>
             </div>
             <div>
-              <dt className="text-sm text-slate-500">Custo Total</dt>
+              <dt className="text-sm text-muted-foreground">Custo Total</dt>
               <dd className="text-lg font-semibold">{currencyFormatter.format(query.data.custoTotal)}</dd>
             </div>
           </dl>

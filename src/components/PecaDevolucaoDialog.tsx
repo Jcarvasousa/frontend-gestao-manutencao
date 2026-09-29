@@ -132,7 +132,7 @@ export function PecaDevolucaoDialog({ open, onOpenChange, manutencaoId, pecaUsad
               aria-invalid={Boolean(fieldErrors.quantidade)}
             />
             {pecaUsada && (
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-muted-foreground">
                 Saldo devolvível: {pecaUsada.saldoDevolvivel} {unidade}
               </p>
             )}

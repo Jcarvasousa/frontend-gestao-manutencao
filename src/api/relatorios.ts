@@ -16,7 +16,7 @@ export interface CustoMaquinasFiltro {
 }
 
 export interface CustoSetoresFiltro {
-  setorIds: number[]
+  setorIds?: number[]
   mes?: number
   ano?: number
 }
@@ -26,7 +26,7 @@ function paramsCustoMaquinas({ maquinaIds, mes, ano }: CustoMaquinasFiltro) {
 }
 
 function paramsCustoSetores({ setorIds, mes, ano }: CustoSetoresFiltro) {
-  return { setorIds: setorIds.join(','), mes, ano }
+  return { setorIds: setorIds && setorIds.length > 0 ? setorIds.join(',') : undefined, mes, ano }
 }
 
 function sufixoPeriodo(mes?: number, ano?: number) {

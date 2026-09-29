@@ -36,7 +36,7 @@ export function OrcamentosMensais() {
 
   return (
     <section className="mx-auto max-w-6xl px-6 py-10">
-      <p className="text-sm font-medium text-slate-500">Módulo</p>
+      <p className="text-sm font-medium text-muted-foreground">Módulo</p>
       <h2 className="mt-2 text-3xl font-semibold tracking-tight">Orçamento Mensal</h2>
 
       <div className="mt-6 flex items-center gap-3">
@@ -51,7 +51,7 @@ export function OrcamentosMensais() {
 
       <div className="mt-6 overflow-hidden rounded-lg border">
         {query.isPending ? (
-          <p className="p-6 text-sm text-slate-500">Carregando...</p>
+          <p className="p-6 text-sm text-muted-foreground">Carregando...</p>
         ) : query.isError ? (
           <p className="p-6 text-sm text-destructive">Não foi possível carregar os orçamentos.</p>
         ) : (

@@ -64,7 +64,7 @@ export function Estoque() {
 
   return (
     <section className="mx-auto max-w-6xl px-6 py-10">
-      <p className="text-sm font-medium text-slate-500">Módulo</p>
+      <p className="text-sm font-medium text-muted-foreground">Módulo</p>
       <h2 className="mt-2 text-3xl font-semibold tracking-tight">Movimentações</h2>
 
       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -129,11 +129,11 @@ export function Estoque() {
 
       <div className="mt-6 overflow-hidden rounded-lg border">
         {query.isPending ? (
-          <p className="p-6 text-sm text-slate-500">Carregando...</p>
+          <p className="p-6 text-sm text-muted-foreground">Carregando...</p>
         ) : query.isError ? (
           <p className="p-6 text-sm text-destructive">Não foi possível carregar as movimentações.</p>
         ) : movimentacoes.length === 0 ? (
-          <p className="p-6 text-sm text-slate-500">Nenhuma movimentação encontrada</p>
+          <p className="p-6 text-sm text-muted-foreground">Nenhuma movimentação encontrada</p>
         ) : (
           <Table>
             <TableHeader>
@@ -184,7 +184,7 @@ export function Estoque() {
 
       {!query.isPending && !query.isError && query.data && (
         <div className="mt-4 flex flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-slate-500">{query.data.totalElements} registros</p>
+          <p className="text-muted-foreground">{query.data.totalElements} registros</p>
           <div className="flex items-center gap-3">
             <Button
               variant="outline"

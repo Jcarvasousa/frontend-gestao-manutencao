@@ -68,11 +68,11 @@ export function RelatorioCustoMaquinasCard() {
 
       <div className="mt-6">
         {ids.length === 0 ? (
-          <p className="text-sm text-slate-500">Selecione ao menos uma máquina para ver o custo detalhado.</p>
+          <p className="text-sm text-muted-foreground">Selecione ao menos uma máquina para ver o custo detalhado.</p>
         ) : periodo.erro !== null ? (
           <p className="text-sm text-destructive">{periodo.erro}</p>
         ) : query.isPending ? (
-          <p className="text-sm text-slate-500">Carregando...</p>
+          <p className="text-sm text-muted-foreground">Carregando...</p>
         ) : query.isError ? (
           <p className="text-sm text-destructive">
             {mensagemDeErro(query.error, 'Não foi possível carregar o relatório.')}
@@ -120,6 +120,7 @@ export function RelatorioCustoMaquinasCard() {
                 </TableRow>
               </TableFooter>
             </Table>
+            <p className="mt-2 text-xs text-muted-foreground">Mão de obra = técnicos + terceiros</p>
             <div className="mt-4 flex items-center justify-end gap-3">
               {erroPdf && <p className="text-sm text-destructive">{erroPdf}</p>}
               <Button variant="outline" size="sm" disabled={baixando} onClick={baixarPdf}>

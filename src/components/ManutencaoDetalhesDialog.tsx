@@ -82,7 +82,7 @@ export function ManutencaoDetalhesDialog({ open, onOpenChange, manutencaoId }: M
         </DialogHeader>
 
         {query.isPending ? (
-          <p className="text-sm text-slate-500">Carregando...</p>
+          <p className="text-sm text-muted-foreground">Carregando...</p>
         ) : query.isError ? (
           <p className="text-sm text-destructive" role="alert">
             {mensagemDeErro(query.error, 'Não foi possível carregar a manutenção.')}
@@ -91,7 +91,7 @@ export function ManutencaoDetalhesDialog({ open, onOpenChange, manutencaoId }: M
           <div className="grid gap-6">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-sm">
-                <span className="text-slate-500">Status: </span>
+                <span className="text-muted-foreground">Status: </span>
                 <span className="font-medium">{STATUS_MANUTENCAO_LABELS[query.data.status]}</span>
               </p>
 
@@ -124,12 +124,12 @@ export function ManutencaoDetalhesDialog({ open, onOpenChange, manutencaoId }: M
             )}
 
             {query.data.status === 'CANCELADA' && (
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-muted-foreground">
                 Manutenção cancelada: os dados abaixo são somente leitura.
               </p>
             )}
             {query.data.status === 'CONCLUIDA' && (
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-muted-foreground">
                 Manutenção concluída: apenas o valor final e a observação dos serviços de terceiros podem ser editados.
               </p>
             )}

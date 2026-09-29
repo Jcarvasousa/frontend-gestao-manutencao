@@ -35,11 +35,11 @@ export function SetorCheckList({ value, onChange }: SetorCheckListProps) {
         </div>
       </div>
       {query.isPending ? (
-        <p className="mt-2 text-sm text-slate-500">Carregando setores...</p>
+        <p className="mt-2 text-sm text-muted-foreground">Carregando setores...</p>
       ) : query.isError ? (
         <p className="mt-2 text-sm text-destructive">Não foi possível carregar os setores.</p>
       ) : setores.length === 0 ? (
-        <p className="mt-2 text-sm text-slate-500">Nenhum setor cadastrado.</p>
+        <p className="mt-2 text-sm text-muted-foreground">Nenhum setor cadastrado.</p>
       ) : (
         <div className="mt-2 grid max-h-48 grid-cols-1 gap-x-4 gap-y-1 overflow-y-auto rounded-lg border p-2 sm:grid-cols-2 lg:grid-cols-3">
           {setores.map((setor) => (
