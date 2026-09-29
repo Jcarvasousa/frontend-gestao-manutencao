@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { buscarKpis } from '@/api/relatorios'
 import { buscarPendentes } from '@/api/solicitacoesCompra'
 import { ReceberButton } from '@/pages/Compras'
 import { Badge } from '@/components/ui/badge'
@@ -50,7 +51,14 @@ function DiasEmAbertoBadge({ dias }: { dias: number }) {
   return <Badge variant="secondary">{dias} dias</Badge>
 }
 
+const horasFormatter = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 1 })
+
 export function Dashboard() {
+  const kpisQuery = useQuery({
+    queryKey: ['relatorios', 'kpis'],
+    queryFn: buscarKpis,
+  })
+
   const query = useQuery({
     queryKey: ['solicitacoes-pendentes'],
     queryFn: buscarPendentes,
@@ -67,7 +75,41 @@ export function Dashboard() {
       <p className="text-sm font-medium text-slate-500">Módulo</p>
       <h2 className="mt-2 text-3xl font-semibold tracking-tight">Dashboard</h2>
 
-      <div className="mt-8 overflow-hidden rounded-lg border">
+      <div className="mt-8 grid gap-4 sm:grid-cols-2">
+        <div className="rounded-lg border bg-white p-5">
+          <p className="text-sm font-medium text-slate-500">Backlog de manutenções</p>
+          {kpisQuery.isPending ? (
+            <p className="mt-2 text-sm text-slate-500">Carregando...</p>
+          ) : kpisQuery.isError ? (
+            <p className="mt-2 text-sm text-destructive">Não foi possível carregar o indicador.</p>
+          ) : (
+            <p className="mt-2 text-3xl font-semibold tracking-tight">
+              {kpisQuery.data.backlogQuantidade}
+              <span className="ml-2 text-sm font-normal text-slate-500">
+                {kpisQuery.data.backlogQuantidade === 1 ? 'manutenção' : 'manutenções'}
+              </span>
+            </p>
+          )}
+        </div>
+        <div className="rounded-lg border bg-white p-5">
+          <p className="text-sm font-medium text-slate-500">MTTR (tempo médio de reparo)</p>
+          {kpisQuery.isPending ? (
+            <p className="mt-2 text-sm text-slate-500">Carregando...</p>
+          ) : kpisQuery.isError ? (
+            <p className="mt-2 text-sm text-destructive">Não foi possível carregar o indicador.</p>
+          ) : kpisQuery.data.mttrHoras == null ? (
+            <p className="mt-2 text-lg text-slate-500">Sem dados</p>
+          ) : (
+            <p className="mt-2 text-3xl font-semibold tracking-tight">
+              {horasFormatter.format(kpisQuery.data.mttrHoras)}
+              <span className="ml-2 text-sm font-normal text-slate-500">horas</span>
+            </p>
+          )}
+        </div>
+      </div>
+
+      <h3 className="mt-10 text-lg font-semibold tracking-tight">Compras pendentes</h3>
+      <div className="mt-4 overflow-hidden rounded-lg border">
         {query.isPending ? (
           <p className="p-6 text-sm text-slate-500">Carregando...</p>
         ) : query.isError ? (

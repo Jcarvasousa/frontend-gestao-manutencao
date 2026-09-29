@@ -33,6 +33,11 @@ export interface RelatorioOrcamentoAnual {
   percentualUtilizado: number
 }
 
+export interface RelatorioKpis {
+  backlogQuantidade: number
+  mttrHoras: number | null
+}
+
 export interface RelatorioGastoRealizado {
   mes: number
   ano: number

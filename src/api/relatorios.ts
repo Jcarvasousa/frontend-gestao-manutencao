@@ -3,9 +3,15 @@ import type {
   RelatorioCustoMaquina,
   RelatorioCustoMensal,
   RelatorioGastoRealizado,
+  RelatorioKpis,
   RelatorioOrcamentoAnual,
   RelatorioOrcamentoMensal,
 } from '@/types/Relatorio'
+
+export async function buscarKpis(): Promise<RelatorioKpis> {
+  const { data } = await apiClient.get<RelatorioKpis>('/relatorios/kpis')
+  return data
+}
 
 export async function buscarCustoMensal(mes: number, ano: number): Promise<RelatorioCustoMensal> {
   const { data } = await apiClient.get<RelatorioCustoMensal>('/relatorios/custo-mensal', { params: { mes, ano } })
